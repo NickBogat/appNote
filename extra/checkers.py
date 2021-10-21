@@ -1,4 +1,5 @@
-from callbacks import *
+from extra.callbacks import *
+from datetime import datetime
 
 
 class Checker:
@@ -6,7 +7,7 @@ class Checker:
         pass
 
     def check_valid_number(self, tender: str):
-        if len(tender) < 2 or tender[0] not in ("=", "-"):
+        if len(tender) < 2 or tender[0] not in ("+", "-"):
             raise BadMoneyAmount("Неверный формат суммы!")
         _available = "0123456789"
         sign = tender[0]
@@ -30,10 +31,13 @@ class Checker:
         try:
             __number = __argument[0]
             __category = " ".join(__argument[1:])
+            __current_date = datetime.now()
             self.check_valid_number(__number)
             self.check_valid_category(__category)
-            return int(__number), __category
+            return str(__current_date), int(__number), __category
         except BadMoneyAmount as er:
+            print(er)
             return False
         except BadCategoryName as er:
+            print(er)
             return False
