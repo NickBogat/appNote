@@ -27,17 +27,10 @@ class Checker:
     def check_valid_post_argument(self, argument: str):
         __argument = argument.split()
         if len(__argument) < 2:
-            return False
-        try:
-            __number = __argument[0]
-            __category = " ".join(__argument[1:])
-            __current_date = datetime.now()
-            self.check_valid_number(__number)
-            self.check_valid_category(__category)
-            return str(__current_date), int(__number), __category
-        except BadMoneyAmount as er:
-            print(er)
-            return False
-        except BadCategoryName as er:
-            print(er)
-            return False
+            raise BadMoneyAmount("Неверное количество аргуметов!")
+        __number = __argument[0]
+        __category = " ".join(__argument[1:])
+        __current_date = datetime.now()
+        self.check_valid_number(__number)
+        self.check_valid_category(__category)
+        return str(__current_date), int(__number), __category
