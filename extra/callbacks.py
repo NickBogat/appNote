@@ -25,6 +25,4 @@ class BadEnterData(ProgramExceptions):
     pass
 
 
-def show_error_box(er):
-    error_dialog = QErrorMessage()
-    error_dialog.showMessage(er)
+

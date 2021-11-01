@@ -54,21 +54,26 @@ class Checker:
         print(f"Checking << {login} : {password}")
         query = f"""SELECT id FROM accounts WHERE login = ? AND password = ?"""
         result = list(self.__cursor.execute(query, (login, password,)))
+        print(result)
         return len(result) == 1
 
     def check_valid_general_auth_data(self, returned_value):
         if returned_value is None:
             raise BadArgument("Ошибка авторизации!")
         if not returned_value:
-            return False
+            raise BadArgument("Ошибка авторизации!")
         if not (self.check_valid_enter_data(returned_value)):
             raise BadEnterData("Неправильный логин/пароль!")
-        return True
+        return returned_value[0]
 
     def check_valid_reg_data(self, data):
         __login = data[0]
         __password1 = data[1]
         __password2 = data[2]
+        if len(__login) < 5:
+            raise BadEnterData("Неверный формат логина!")
+        if len(__password1) < 5:
+            raise BadEnterData("Неверный формат пароля!")
         if self.check_login_exists(__login):
             raise LoginAlreadyExists("Пользователь уже существует!")
         if __password1 != __password2:
