@@ -89,7 +89,6 @@ class MyWidget(QMainWindow, Ui_MainWindow):
     def show_profile(self):
         try:
             dlg = ProfileDialog()
-            dlg.show()
             res = dlg.select_data(self.login)
         except Exception as er:
             self.show_error_box(er)
