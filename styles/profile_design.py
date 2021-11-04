@@ -29,6 +29,9 @@ class Ui_Profile_Dialog(object):
         self.tableView = QtWidgets.QTableView(Dialog)
         self.tableView.setGeometry(QtCore.QRect(25, 91, 511, 241))
         self.tableView.setObjectName("tableView")
+        self.pushButton = QtWidgets.QPushButton(Dialog)
+        self.pushButton.setGeometry(QtCore.QRect(25, 360, 111, 41))
+        self.pushButton.setObjectName("pushButton")
 
         self.retranslateUi(Dialog)
         self.buttonBox.accepted.connect(Dialog.accept)
@@ -39,3 +42,4 @@ class Ui_Profile_Dialog(object):
         _translate = QtCore.QCoreApplication.translate
         Dialog.setWindowTitle(_translate("Dialog", "Dialog"))
         self.label.setText(_translate("Dialog", "Список постов"))
+        self.pushButton.setText(_translate("Dialog", "Сохранить в csv"))
