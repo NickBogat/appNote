@@ -1,7 +1,7 @@
 import sqlite3
 
 from extra.callbacks import *
-from datetime import datetime
+from datetime import datetime, timedelta
 import hashlib
 
 
@@ -20,6 +20,8 @@ class Checker:
         _available = "0123456789"
         sign = tender[0]
         tender = tender[1:]
+        if tender == "0":
+            raise BadMoneyAmount("Неверный формат суммы!")
         for i in range(len(tender)):
             if tender[i] not in _available:
                 raise BadMoneyAmount("Неверный формат суммы!")
@@ -79,3 +81,17 @@ class Checker:
         if __password1 != __password2:
             raise BadEnterData("Не совпадают пароли!")
         return __login, hash_password(__password1)
+
+    def check_valid_date_period(self, current_date, example, period):
+        example = example.split()[0]
+        if period == "d":
+            return example == str(current_date)
+        elif period == "w":
+            dist = current_date.weekday()
+            first_day_of_week = current_date - timedelta(days=dist)
+            new_date = example.split("-")
+            new_date = datetime(int(new_date[0]), int(new_date[1]), int(new_date[2])).date()
+            return first_day_of_week <= new_date
+        elif period == "m":
+            return example[:-3] == str(current_date)[:-3]
+
