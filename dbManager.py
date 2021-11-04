@@ -17,6 +17,8 @@ class Database:
         return result
 
     def add_post_to_db(self, login, argument, comment=""):
+        if not (self.checker.check_login_exists(login)):
+            raise BadArgument("Польователя не существует!")
         result_date, result_number, result_category = self.checker.check_valid_post_argument(argument)
         query = f"""INSERT INTO Data(date, amount, category, comment, login) VALUES(?, ?, ?, ?, ?)"""
         self.cursor.execute(query, (result_date, result_number, result_category, comment, login,))
@@ -30,3 +32,17 @@ class Database:
         self.cursor.execute(query, (__login, __password_hash,))
         self.conn.commit()
         return __login
+
+    def show_all_user_expenses(self, login):
+        if not (self.checker.check_login_exists(login)):
+            raise BadArgument("Польователя не существует!")
+        query = f"""SELECT amount, category, date FROM Data WHERE (login = ?) AND (amount < 0)"""
+        result = self.cursor.execute(query, (login,)).fetchall()
+        return result
+
+    def show_all_user_revenue(self, login):
+        if not (self.checker.check_login_exists(login)):
+            raise BadArgument("Польователя не существует!")
+        query = f"""SELECT amount, category, date FROM Data WHERE (login = ?) AND (amount > 0)"""
+        result = self.cursor.execute(query, (login,)).fetchall()
+        return result

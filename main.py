@@ -1,13 +1,13 @@
 import sys
 
 from PyQt5.QtGui import QPixmap, QIcon
-from PyQt5.QtWidgets import QApplication, QMainWindow, QErrorMessage, QMessageBox
+from PyQt5.QtWidgets import QApplication, QMainWindow, QErrorMessage, QMessageBox, QDialog, QInputDialog
 
 from styles.design import Ui_MainWindow
 from extra.checkers import Checker
 from extra.callbacks import *
 from dbManager import Database
-from auth import AuthDialog, RegDialog, AddPostDialog, ProfileDialog
+from auth import AuthDialog, RegDialog, AddPostDialog, ProfileDialog, StatisticDialog
 
 
 class MyWidget(QMainWindow, Ui_MainWindow):
@@ -25,6 +25,7 @@ class MyWidget(QMainWindow, Ui_MainWindow):
         self.login = None
         self.plusButton.clicked.connect(self.add_post)
         self.homeButton.clicked.connect(self.open_account)
+        self.statButton.clicked.connect(self.show_statistic)
 
     def show_error_box(self, er):
         msg = QMessageBox()
@@ -37,9 +38,10 @@ class MyWidget(QMainWindow, Ui_MainWindow):
         try:
             if self.authorized:
                 dlg = AddPostDialog()
-                returned_value = dlg.getResults()
+                returnCode = dlg.exec_()
+                returned_value = dlg.getValue()
                 print(f"Returned from adding post - {returned_value}")
-                if returned_value:
+                if returnCode:
                     money_arg = returned_value[0]
                     category_arg = returned_value[1]
                     comment_arg = returned_value[2]
@@ -58,38 +60,57 @@ class MyWidget(QMainWindow, Ui_MainWindow):
                 self.show_profile()
                 return
             dlg = AuthDialog()
-            returned_value = dlg.getResults()
-            if not returned_value:
-                dlg.close_dialog()
+            returnCode = dlg.exec_()
+            returned_value = dlg.getValue()
+            print(f"Returned from entering account {returned_value}")
+            if returnCode:
+                result = self.Checker.check_valid_general_auth_data(returned_value)
+                self.authorized = True
+                self.login = result
+                QMessageBox.about(self, "Info", "Вы успешно вошли в аккаунт!")
+                print(self.login, self.authorized)
+            elif dlg.want_to_reg:
+                print("reff")
                 self.create_account()
-                return
-            print(f"Returned from entering - {returned_value}")
-            result = self.Checker.check_valid_general_auth_data(returned_value)
-            self.authorized = True
-            self.login = result
-            QMessageBox.about(self, "Info", "Вы успешно вошли в аккаунт!")
-            print(self.login, self.authorized)
         except (BadArgument, BadEnterData, Exception) as er:
             self.show_error_box(er)
 
     def create_account(self):
         try:
             dlg = RegDialog()
-            returned_value = dlg.getResults()
-            print(returned_value)
-            if returned_value:
+            returnCode = dlg.exec_()
+            returned_value = dlg.getValue()
+            print(f"Returned from creating account {returned_value}")
+            if returnCode:
                 result = self.db.add_new_account_to_db(returned_value)
                 self.authorized = True
                 self.login = result
                 QMessageBox.about(self, "Info", "Вы успешно вошли в аккаунт!")
-                print(self.login, self.authorized)
         except (LoginAlreadyExists, BadEnterData, Exception) as er:
             self.show_error_box(er)
 
     def show_profile(self):
         try:
             dlg = ProfileDialog()
-            res = dlg.select_data(self.login)
+            dlg.select_data(self.login)
+            returnCode = dlg.exec_()
+        except Exception as er:
+            self.show_error_box(er)
+
+    def show_statistic(self):
+        try:
+            dlg = StatisticDialog()
+            answer, ok_pressed = QInputDialog.getItem(
+                self, "Выберите промежуток времени", "Какой период времени?",
+                ("День", "Неделя", "Месяц"), 1, False)
+            if ok_pressed:
+                av = {
+                    "День": "d",
+                    "Неделя": "w",
+                    "Месяц": "m",
+                }
+                answer_period = av[answer]
+                dlg.select_data(self.login, answer_period)
         except Exception as er:
             self.show_error_box(er)
 
