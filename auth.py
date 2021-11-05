@@ -1,3 +1,4 @@
+from PyQt5.QtGui import QPixmap
 from PyQt5.QtWidgets import QDialog, QTableWidgetItem, QTableView, QHeaderView
 from PyQt5 import QtCore, Qt
 from styles.auth_design import Ui_Dialog_Auth
@@ -8,7 +9,7 @@ from styles.statistic_design import Ui_Statistic_Dialog
 from extra.checkers import Checker
 from dbManager import Database
 import pandas as pd
-import matplotlib as plt
+import matplotlib.pyplot as plt
 from datetime import datetime
 
 
@@ -102,8 +103,7 @@ class StatisticDialog(QDialog, Ui_Statistic_Dialog):
         self.__db = Database()
         self.__ch = Checker()
 
-    def select_data(self, login, period):
-        user_data = self.__db.show_all_user_expenses(login)
+    def prepare_data(self, user_data, sign, period):
         today_date = datetime.now().date()
         visual_data = {}
         if user_data:
@@ -111,12 +111,46 @@ class StatisticDialog(QDialog, Ui_Statistic_Dialog):
                 if self.__ch.check_valid_date_period(today_date, i[2], period):
                     visual_data.setdefault(i[1], 0)
                     visual_data[i[1]] += abs(i[0])
-        print(visual_data)
+        sorted_tuple = sorted(visual_data.items(), key=lambda x: x[1], reverse=True)
+        visual_data = dict(sorted_tuple)
+        labels = list(visual_data.keys())
+        amounts = list(visual_data.values())
+        _sum = sum(amounts)
+        _percent = 100
+        if len(amounts) > 1:
+            for i in range(len(amounts)):
+                if _percent - (amounts[i] / _sum * 100) < 1:
+                    amounts = amounts[:i] + [sum(amounts[i:])]
+                    labels = labels[:i] + ["other"]
+                    break
+                _percent -= (amounts[i] / _sum * 100)
+        fig, ax = plt.subplots()
+        ax.pie(amounts, labels=labels, autopct='%1.1f%%', shadow=True,
+               wedgeprops={'lw': 1, 'ls': '--', 'edgecolor': "k"}, rotatelabels=True)
+        ax.axis("equal")
+        name = sign + str(datetime.now()).replace(':', ' ')
+        plt.savefig(f"img/{name}.png")
+        return name, visual_data
 
+    def select_data(self, login, period):
+        user_expences = self.__db.show_all_user_expenses(login)
+        user_revenue = self.__db.show_all_user_revenue(login)
+        filename_expences, data_expences = self.prepare_data(user_expences, "-", period)
+        filename_revenue, data_revenue = self.prepare_data(user_revenue, "+", period)
+        if len(data_expences) == 0:
+            self.expenceLabelPicture.setPixmap(QPixmap("img/nodata.png"))
+            self.expenceLabelText.setText("Нет данных")
+        else:
+            self.expenceLabelPicture.setPixmap(QPixmap(f"img/{filename_expences}.png"))
+            biggest_ex = (list(data_expences.keys())[0], sum(data_expences.values()))
+            self.expenceLabelText.setText(
+                f"Наиболее затратная категория - {biggest_ex[0]}. Всего потрачено: {biggest_ex[1]}")
+        if len(data_revenue) == 0:
+            self.revenueLabelPicture.setPixmap(QPixmap("img/nodata.png"))
+            self.revenueLabelText.setText("Нет данных")
+        else:
 
-
-
-        # fig, ax = plt.subplots()
-        # ax.pie(values, labels=labels, autopct='%1.1f%%', shadow=True,
-        #        wedgeprops={'lw': 1, 'ls': '--', 'edgecolor': "k"}, rotatelabels=True)
-        # ax.axis("equal")
+            self.revenueLabelPicture.setPixmap(QPixmap(f"img/{filename_revenue}.png"))
+            biggest_rev = (list(data_revenue.keys())[0], sum(data_revenue.values()))
+            self.revenueLabelText.setText(
+                f"Наиболее доходная категория - {biggest_rev[0]}. Всего заработано: {biggest_rev[1]}")

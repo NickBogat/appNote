@@ -99,7 +99,9 @@ class MyWidget(QMainWindow, Ui_MainWindow):
 
     def show_statistic(self):
         try:
-            dlg = StatisticDialog()
+            if self.login is None:
+                raise BadEnterData("Вы не авторизованы!")
+
             answer, ok_pressed = QInputDialog.getItem(
                 self, "Выберите промежуток времени", "Какой период времени?",
                 ("День", "Неделя", "Месяц"), 1, False)
@@ -110,7 +112,9 @@ class MyWidget(QMainWindow, Ui_MainWindow):
                     "Месяц": "m",
                 }
                 answer_period = av[answer]
+                dlg = StatisticDialog()
                 dlg.select_data(self.login, answer_period)
+                returnCode = dlg.exec_()
         except Exception as er:
             self.show_error_box(er)
 
