@@ -1,13 +1,13 @@
 import sys
 
 from PyQt5.QtGui import QPixmap, QIcon
-from PyQt5.QtWidgets import QApplication, QMainWindow, QErrorMessage, QMessageBox, QDialog, QInputDialog
+from PyQt5.QtWidgets import QApplication, QMainWindow, QMessageBox, QInputDialog
 
 from styles.design import Ui_MainWindow
 from extra.checkers import Checker
 from extra.callbacks import *
 from dbManager import Database
-from auth import AuthDialog, RegDialog, AddPostDialog, ProfileDialog, StatisticDialog
+from styles.auth import *
 
 
 class MyWidget(QMainWindow, Ui_MainWindow):
@@ -37,17 +37,31 @@ class MyWidget(QMainWindow, Ui_MainWindow):
     def add_post(self):
         try:
             if self.authorized:
-                dlg = AddPostDialog()
-                returnCode = dlg.exec_()
-                returned_value = dlg.getValue()
-                print(f"Returned from adding post - {returned_value}")
-                if returnCode:
+                dlg_type = ChooseTypeDialog()
+                returnCode_type = dlg_type.exec_()
+                returned_value_type = dlg_type.getValue()
+                dlg_post = AddPostDialog()
+                if returned_value_type[0]:
+                    database_type = "expences"
+                elif returned_value_type[1]:
+                    database_type = "revenue"
+                dlg_post.select_data(database_type)
+                returnCode_post = dlg_post.exec_()
+                returned_value = dlg_post.getValue()
+                if returnCode_post:
                     money_arg = returned_value[0]
                     category_arg = returned_value[1]
-                    comment_arg = returned_value[2]
-                    argument = " ".join([money_arg, category_arg])
-                    self.db.add_post_to_db(self.login, argument, comment_arg)
+                    subcategory_arg = returned_value[2]
+                    comment_arg = returned_value[3]
+                    if len(category_arg) < 2 or len(subcategory_arg) < 2:
+                        raise BadArgument("Недопустимое значение категорий!")
+                    argument = "%".join([money_arg, category_arg, subcategory_arg])
+                    self.db.add_post_to_db(database_type, self.login, argument, comment_arg)
                     QMessageBox.about(self, "Info", "Вы успешно добавли запись!")
+                elif dlg_post.want_to_create_category:
+                    self.create_category(database_type)
+                elif dlg_post.want_to_create_subcategory:
+                    self.create_sub_category(database_type)
             else:
                 print("Ошибка добавления записи")
                 self.show_error_box("Вы не авторизваны!")
@@ -70,7 +84,6 @@ class MyWidget(QMainWindow, Ui_MainWindow):
                 QMessageBox.about(self, "Info", "Вы успешно вошли в аккаунт!")
                 print(self.login, self.authorized)
             elif dlg.want_to_reg:
-                print("reff")
                 self.create_account()
         except (BadArgument, BadEnterData, Exception) as er:
             self.show_error_box(er)
@@ -89,17 +102,72 @@ class MyWidget(QMainWindow, Ui_MainWindow):
         except (LoginAlreadyExists, BadEnterData, Exception) as er:
             self.show_error_box(er)
 
+    def create_category(self, database_type):
+        try:
+            dlg = CreateCategoryDialog()
+            returnCode = dlg.exec_()
+            returned_value = dlg.getValue()
+            if returnCode:
+                self.db.add_category(returned_value, database_type)
+                QMessageBox.about(self, "Info", f"Вы успешно создали категорию{returned_value}!")
+        except (BadArgument, Exception) as er:
+            self.show_error_box(er)
+
+    def create_sub_category(self, database_type):
+        try:
+            dlg = CreateSubCategoryDialog()
+            dlg.select_data(database_type)
+            returnCode = dlg.exec_()
+            returned_value = dlg.getValue()
+            if returnCode:
+                category, name = returned_value
+                self.db.add_sub_category(category, name, database_type)
+                QMessageBox.about(self, "Info",
+                                  f"Вы успешно создали подкатегорию {returned_value[1]} в {returned_value[0]}!")
+        except (BadArgument, Exception) as er:
+            self.show_error_box(er)
+
     def show_profile(self):
         try:
             dlg = ProfileDialog()
             dlg.select_data(self.login)
+            returned_value = dlg.getValue()
             returnCode = dlg.exec_()
+            if dlg.want_to_change_category or dlg.want_to_change_sub_category:
+                dlg_type = ChooseTypeDialog()
+                returnCode_type = dlg_type.exec_()
+                returned_value_type = dlg_type.getValue()
+                if returned_value_type[0]:
+                    database_type = "exp"
+                    database_name = "expences"
+                elif returned_value_type[1]:
+                    database_type = "rev"
+                    database_name = "revenue"
+                if dlg.want_to_change_category:
+                    dlg_change = ChangeCategoryName()
+                    dlg_change.select_data(database_name)
+                    returnCode_change = dlg_change.exec_()
+                    returned_value_changed = dlg_change.getValue()
+                    if returnCode_change:
+                        self.db.change_category_name("category_" + database_type, returned_value_changed[0],
+                                                     returned_value_changed[1])
+                elif dlg.want_to_change_sub_category:
+                    dlg_change = ChangeSubCategoryName()
+                    dlg_change.select_data(database_name)
+                    returnCode_change = dlg_change.exec_()
+                    returned_value_changed = dlg_change.getValue()
+                    if returnCode_change:
+                        self.db.change_category_name("subcategory_" + database_type, returned_value_changed[0],
+                                                     returned_value_changed[1])
+
         except Exception as er:
             self.show_error_box(er)
 
     def show_statistic(self):
         try:
-            dlg = StatisticDialog()
+            if self.login is None:
+                raise BadEnterData("Вы не авторизованы!")
+
             answer, ok_pressed = QInputDialog.getItem(
                 self, "Выберите промежуток времени", "Какой период времени?",
                 ("День", "Неделя", "Месяц"), 1, False)
@@ -110,7 +178,9 @@ class MyWidget(QMainWindow, Ui_MainWindow):
                     "Месяц": "m",
                 }
                 answer_period = av[answer]
+                dlg = StatisticDialog()
                 dlg.select_data(self.login, answer_period)
+                returnCode = dlg.exec_()
         except Exception as er:
             self.show_error_box(er)
 

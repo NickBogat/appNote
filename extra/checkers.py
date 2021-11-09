@@ -15,11 +15,9 @@ class Checker:
         self.__cursor = self.__conn.cursor()
 
     def check_valid_number(self, tender: str):
-        if len(tender) < 2 or tender[0] not in ("+", "-"):
+        if len(tender) < 1:
             raise BadMoneyAmount("Неверный формат суммы!")
         _available = "0123456789"
-        sign = tender[0]
-        tender = tender[1:]
         if tender == "0":
             raise BadMoneyAmount("Неверный формат суммы!")
         for i in range(len(tender)):
@@ -40,15 +38,17 @@ class Checker:
         return len(result) != 0
 
     def check_valid_post_argument(self, argument: str):
-        __argument = argument.split()
+        __argument = argument.split("%")
         if len(__argument) < 2:
             raise BadMoneyAmount("Неверное количество аргуметов!")
         __number = __argument[0]
-        __category = " ".join(__argument[1:])
+        __category = __argument[1]
+        __subcategory = __argument[2]
         __current_date = datetime.now()
         self.check_valid_number(__number)
         self.check_valid_category(__category)
-        return str(__current_date), int(__number), __category
+        self.check_valid_category(__subcategory)
+        return str(__current_date), int(__number), __category, __subcategory
 
     def check_valid_enter_data(self, data):
         login = data[0]
@@ -94,4 +94,18 @@ class Checker:
             return first_day_of_week <= new_date
         elif period == "m":
             return example[:-3] == str(current_date)[:-3]
+        else:
+            raise BadArgument("Неверный период вермени")
 
+    def check_valid_category_name(self, name):
+        if len(name) < 5:
+            raise BadCategoryName("Недопустимое название категории!")
+        if name.isdigit():
+            raise BadCategoryName("Недопустимое название категории!")
+
+    def check_category_exists(self, database_type, name):
+        query = """SELECT id FROM ? WHERE name = ?"""
+        result = self.__cursor.execute(query, (database_type, name, ))
+        if result:
+            return True
+        return False

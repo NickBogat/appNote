@@ -1,4 +1,7 @@
 from datetime import date, datetime, timedelta
 
-today_date = datetime.now().date()
-print(today_date)
+a = {
+    1: [1, 2, 3],
+    2: [4, 5, 6]
+}
+print(list(a.values()))
