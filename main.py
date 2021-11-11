@@ -28,6 +28,7 @@ class MyWidget(QMainWindow, Ui_MainWindow):
         self.statButton.clicked.connect(self.show_statistic)
 
     def show_error_box(self, er):
+        print(f"[ERROR] {er}")
         msg = QMessageBox()
         msg.setIcon(QMessageBox.Critical)
         msg.setText(str(er))
@@ -40,28 +41,29 @@ class MyWidget(QMainWindow, Ui_MainWindow):
                 dlg_type = ChooseTypeDialog()
                 returnCode_type = dlg_type.exec_()
                 returned_value_type = dlg_type.getValue()
-                dlg_post = AddPostDialog()
-                if returned_value_type[0]:
-                    database_type = "expences"
-                elif returned_value_type[1]:
-                    database_type = "revenue"
-                dlg_post.select_data(database_type)
-                returnCode_post = dlg_post.exec_()
-                returned_value = dlg_post.getValue()
-                if returnCode_post:
-                    money_arg = returned_value[0]
-                    category_arg = returned_value[1]
-                    subcategory_arg = returned_value[2]
-                    comment_arg = returned_value[3]
-                    if len(category_arg) < 2 or len(subcategory_arg) < 2:
-                        raise BadArgument("Недопустимое значение категорий!")
-                    argument = "%".join([money_arg, category_arg, subcategory_arg])
-                    self.db.add_post_to_db(database_type, self.login, argument, comment_arg)
-                    QMessageBox.about(self, "Info", "Вы успешно добавли запись!")
-                elif dlg_post.want_to_create_category:
-                    self.create_category(database_type)
-                elif dlg_post.want_to_create_subcategory:
-                    self.create_sub_category(database_type)
+                if returnCode_type:
+                    dlg_post = AddPostDialog()
+                    if returned_value_type[0]:
+                        database_type = "expences"
+                    elif returned_value_type[1]:
+                        database_type = "revenue"
+                    dlg_post.select_data(database_type)
+                    returnCode_post = dlg_post.exec_()
+                    returned_value = dlg_post.getValue()
+                    if returnCode_post:
+                        money_arg = returned_value[0]
+                        category_arg = returned_value[1]
+                        subcategory_arg = returned_value[2]
+                        comment_arg = returned_value[3]
+                        if len(category_arg) < 2 or len(subcategory_arg) < 2:
+                            raise BadArgument("Недопустимое значение категорий!")
+                        argument = "%".join([money_arg, category_arg, subcategory_arg])
+                        self.db.add_post_to_db(database_type, self.login, argument, comment_arg)
+                        QMessageBox.about(self, "Info", "Вы успешно добавли запись!")
+                    elif dlg_post.want_to_create_category:
+                        self.create_category(database_type)
+                    elif dlg_post.want_to_create_subcategory:
+                        self.create_sub_category(database_type)
             else:
                 print("Ошибка добавления записи")
                 self.show_error_box("Вы не авторизваны!")
@@ -121,7 +123,7 @@ class MyWidget(QMainWindow, Ui_MainWindow):
             returned_value = dlg.getValue()
             if returnCode:
                 category, name = returned_value
-                self.db.add_sub_category(category, name, database_type)
+                self.db.add_sub_category(category, str(name), database_type)
                 QMessageBox.about(self, "Info",
                                   f"Вы успешно создали подкатегорию {returned_value[1]} в {returned_value[0]}!")
         except (BadArgument, Exception) as er:
@@ -137,29 +139,33 @@ class MyWidget(QMainWindow, Ui_MainWindow):
                 dlg_type = ChooseTypeDialog()
                 returnCode_type = dlg_type.exec_()
                 returned_value_type = dlg_type.getValue()
-                if returned_value_type[0]:
-                    database_type = "exp"
-                    database_name = "expences"
-                elif returned_value_type[1]:
-                    database_type = "rev"
-                    database_name = "revenue"
-                if dlg.want_to_change_category:
-                    dlg_change = ChangeCategoryName()
-                    dlg_change.select_data(database_name)
-                    returnCode_change = dlg_change.exec_()
-                    returned_value_changed = dlg_change.getValue()
-                    if returnCode_change:
-                        self.db.change_category_name("category_" + database_type, returned_value_changed[0],
-                                                     returned_value_changed[1])
-                elif dlg.want_to_change_sub_category:
-                    dlg_change = ChangeSubCategoryName()
-                    dlg_change.select_data(database_name)
-                    returnCode_change = dlg_change.exec_()
-                    returned_value_changed = dlg_change.getValue()
-                    if returnCode_change:
-                        self.db.change_category_name("subcategory_" + database_type, returned_value_changed[0],
-                                                     returned_value_changed[1])
-
+                if returnCode_type:
+                    if returned_value_type[0]:
+                        database_type = "exp"
+                        database_name = "expences"
+                    elif returned_value_type[1]:
+                        database_type = "rev"
+                        database_name = "revenue"
+                    if dlg.want_to_change_category:
+                        dlg_change = ChangeCategoryName()
+                        dlg_change.select_data(database_name)
+                        returnCode_change = dlg_change.exec_()
+                        returned_value_changed = dlg_change.getValue()
+                        if returnCode_change:
+                            self.db.change_category_name("category_" + database_type, returned_value_changed[0],
+                                                         returned_value_changed[1])
+                            QMessageBox.about(self, "Info",
+                                              f"Вы успешно редактировали категорию {returned_value_changed[0]}!")
+                    elif dlg.want_to_change_sub_category:
+                        dlg_change = ChangeSubCategoryName()
+                        dlg_change.select_data(database_name)
+                        returnCode_change = dlg_change.exec_()
+                        returned_value_changed = dlg_change.getValue()
+                        if returnCode_change:
+                            self.db.change_category_name("subcategory_" + database_type, returned_value_changed[0],
+                                                         returned_value_changed[1])
+                            QMessageBox.about(self, "Info",
+                                              f"Вы успешно редактировали под категорию {returned_value_changed[0]}!")
         except Exception as er:
             self.show_error_box(er)
 
@@ -167,20 +173,23 @@ class MyWidget(QMainWindow, Ui_MainWindow):
         try:
             if self.login is None:
                 raise BadEnterData("Вы не авторизованы!")
+            post_type = ChooseTypeDialog()
+            returnCode_post_type = post_type.exec_()
+            returned_value_post_type = post_type.getValue()
+            if returnCode_post_type:
+                if returned_value_post_type[0]:
+                    database_name = "expences"
+                elif returned_value_post_type[1]:
+                    database_name = "revenue"
+                statistic_type = ChooseTypeStatisticDialog()
+                returnCode_statistic_type = statistic_type.exec_()
+                returned_value_statistic_type = statistic_type.getValue()
+                if returnCode_statistic_type:
+                    if returned_value_statistic_type[0]:
+                        dlg_main = GraphStatisticDialog()
+                        dlg_main.select_data(database_name, self.login)
+                        returnCode_main_dlg = dlg_main.exec_()
 
-            answer, ok_pressed = QInputDialog.getItem(
-                self, "Выберите промежуток времени", "Какой период времени?",
-                ("День", "Неделя", "Месяц"), 1, False)
-            if ok_pressed:
-                av = {
-                    "День": "d",
-                    "Неделя": "w",
-                    "Месяц": "m",
-                }
-                answer_period = av[answer]
-                dlg = StatisticDialog()
-                dlg.select_data(self.login, answer_period)
-                returnCode = dlg.exec_()
         except Exception as er:
             self.show_error_box(er)
 
@@ -189,4 +198,5 @@ if __name__ == '__main__':
     app = QApplication(sys.argv)
     ex = MyWidget()
     ex.show()
+    print(app.exec_())
     sys.exit(app.exec_())

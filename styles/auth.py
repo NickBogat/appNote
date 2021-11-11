@@ -5,12 +5,13 @@ from styles.auth_design import Ui_Dialog_Auth
 from styles.reg_design import Ui_Dialog_Reg
 from styles.profile_design import Ui_Profile_Dialog
 from styles.add_post_design import Ui_AddPost_Dialog
-from styles.statistic_design import Ui_Statistic_Dialog
 from styles.create_category import Ui_Category_Dialog
 from styles.create_subcategory import Ui_Subcategory_Dialog
 from styles.choose_type_post import Ui_Type_Post_Dialog
 from styles.change_cat_name import Ui_Cat_Change_Dialog
 from styles.change_sub_cat_name import Ui_SubCat_Change_Dialog
+from styles.choose_type_statistic import Ui_Choose_Type_Statistic_Dialog
+from styles.statistic_analyse import Ui_Statistic_Analyse_Dialog
 from extra.checkers import Checker
 from extra.callbacks import *
 from dbManager import Database
@@ -268,67 +269,42 @@ class ChooseTypeDialog(QDialog, Ui_Type_Post_Dialog):
             self.want_to_exp = True
         elif button.text() == "Доход":
             self.want_to_rev = True
-        self.reject()
+        self.accept()
 
     def getValue(self):
         return self.want_to_exp, self.want_to_rev
 
 
-class StatisticDialog(QDialog, Ui_Statistic_Dialog):
+class ChooseTypeStatisticDialog(QDialog, Ui_Choose_Type_Statistic_Dialog):
     def __init__(self):
-        super(StatisticDialog, self).__init__()
+        super(ChooseTypeStatisticDialog, self).__init__()
+        self.setupUi(self)
+        self.want_graph = False
+        self.want_diagram = False
+        self.analyseButton.clicked.connect(self.run)
+        self.diagramButton.clicked.connect(self.run)
+
+    def run(self):
+        button = self.sender().text()
+        if button == "Статистика":
+            self.want_graph = True
+        else:
+            self.want_diagram = True
+        self.accept()
+
+    def getValue(self):
+        return self.want_graph, self.want_diagram
+
+
+class GraphStatisticDialog(QDialog, Ui_Statistic_Analyse_Dialog):
+    def __init__(self):
+        super(GraphStatisticDialog, self).__init__()
         self.setupUi(self)
         self.__db = Database()
-        self.__ch = Checker()
+        self.analyseButton.clicked.connect(self.run)
+        self.diagramButton.clicked.connect(self.run)
+        self.help_dictionary = {}
 
-    def prepare_data(self, user_data, sign, period):
-        today_date = datetime.now().date()
-        visual_data = {}
-        if user_data:
-            for i in user_data:
-                if self.__ch.check_valid_date_period(today_date, i[2], period):
-                    visual_data.setdefault(i[1], 0)
-                    visual_data[i[1]] += abs(i[0])
-        sorted_tuple = sorted(visual_data.items(), key=lambda x: x[1], reverse=True)
-        visual_data = dict(sorted_tuple)
-        labels = list(visual_data.keys())
-        amounts = list(visual_data.values())
-        _sum = sum(amounts)
-        _percent = 100
-        if len(amounts) > 1:
-            for i in range(len(amounts)):
-                if _percent - (amounts[i] / _sum * 100) < 1:
-                    amounts = amounts[:i] + [sum(amounts[i:])]
-                    labels = labels[:i] + ["other"]
-                    break
-                _percent -= (amounts[i] / _sum * 100)
-        fig, ax = plt.subplots()
-        ax.pie(amounts, labels=labels, autopct='%1.1f%%', shadow=True,
-               wedgeprops={'lw': 1, 'ls': '--', 'edgecolor': "k"}, rotatelabels=True)
-        ax.axis("equal")
-        name = sign + str(datetime.now()).replace(':', ' ')
-        plt.savefig(f"img/{name}.png")
-        return name, visual_data
-
-    def select_data(self, login, period):
-        user_expences = self.__db.show_all_user_expenses(login)
-        user_revenue = self.__db.show_all_user_revenue(login)
-        filename_expences, data_expences = self.prepare_data(user_expences, "-", period)
-        filename_revenue, data_revenue = self.prepare_data(user_revenue, "+", period)
-        if len(data_expences) == 0:
-            self.expenceLabelPicture.setPixmap(QPixmap("../img/nodata.png"))
-            self.expenceLabelText.setText("Нет данных")
-        else:
-            self.expenceLabelPicture.setPixmap(QPixmap(f"img/{filename_expences}.png"))
-            biggest_ex = (list(data_expences.keys())[0], sum(data_expences.values()))
-            self.expenceLabelText.setText(
-                f"Наиболее затратная категория - {biggest_ex[0]}. Всего потрачено: {biggest_ex[1]}")
-        if len(data_revenue) == 0:
-            self.revenueLabelPicture.setPixmap(QPixmap("../img/nodata.png"))
-            self.revenueLabelText.setText("Нет данных")
-        else:
-
-            self.revenueLabelPicture.setPixmap(QPixmap(f"img/{filename_revenue}.png"))
-            biggest_rev = (list(data_revenue.keys())[0], sum(data_revenue.values()))
-            self.revenueLabelText.setText(
-                f"Наиболее доходная категория - {biggest_rev[0]}. Всего заработано: {biggest_rev[1]}")
+    def select_data(self, database_type, login):
+        current_period = self.comboBox.currentText()
+        self.__db.show_all_user_year_expences(login)

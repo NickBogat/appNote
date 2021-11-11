@@ -94,6 +94,8 @@ class Checker:
             return first_day_of_week <= new_date
         elif period == "m":
             return example[:-3] == str(current_date)[:-3]
+        elif period == "y":
+            return example[:4] == str(current_date)[:4]
         else:
             raise BadArgument("Неверный период вермени")
 
@@ -104,8 +106,8 @@ class Checker:
             raise BadCategoryName("Недопустимое название категории!")
 
     def check_category_exists(self, database_type, name):
-        query = """SELECT id FROM ? WHERE name = ?"""
-        result = self.__cursor.execute(query, (database_type, name, ))
+        query = f"""SELECT id FROM {database_type} WHERE name = ?"""
+        result = self.__cursor.execute(query, (name, )).fetchall()
         if result:
             return True
         return False
