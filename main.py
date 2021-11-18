@@ -1,5 +1,5 @@
 import sys
-
+import traceback
 from PyQt5.QtGui import QPixmap, QIcon
 from PyQt5.QtWidgets import QApplication, QMainWindow, QMessageBox, QInputDialog
 
@@ -7,7 +7,7 @@ from styles.design import Ui_MainWindow
 from extra.checkers import Checker
 from extra.callbacks import *
 from dbManager import Database
-from styles.auth import *
+from styles.dialogManager import *
 
 
 class MyWidget(QMainWindow, Ui_MainWindow):
@@ -28,7 +28,7 @@ class MyWidget(QMainWindow, Ui_MainWindow):
         self.statButton.clicked.connect(self.show_statistic)
 
     def show_error_box(self, er):
-        print(f"[ERROR] {er}")
+        print(f"[ERROR] {er} - {traceback.format_exc()}")
         msg = QMessageBox()
         msg.setIcon(QMessageBox.Critical)
         msg.setText(str(er))
@@ -51,15 +51,17 @@ class MyWidget(QMainWindow, Ui_MainWindow):
                     returnCode_post = dlg_post.exec_()
                     returned_value = dlg_post.getValue()
                     if returnCode_post:
-                        money_arg = returned_value[0]
-                        category_arg = returned_value[1]
-                        subcategory_arg = returned_value[2]
-                        comment_arg = returned_value[3]
-                        if len(category_arg) < 2 or len(subcategory_arg) < 2:
-                            raise BadArgument("Недопустимое значение категорий!")
-                        argument = "%".join([money_arg, category_arg, subcategory_arg])
-                        self.db.add_post_to_db(database_type, self.login, argument, comment_arg)
-                        QMessageBox.about(self, "Info", "Вы успешно добавли запись!")
+                        receiver, ok_pressed = QInputDialog.getItem(
+                            self, "Выберите куда пойдут деньги", "Получатель",
+                            ("Наличные", "Кредитная карта", "Вклад в банке"), 1, False)
+                        if ok_pressed:
+                            money_arg = returned_value[0]
+                            category_arg = returned_value[1]
+                            subcategory_arg = returned_value[2]
+                            comment_arg = returned_value[3]
+                            argument = "%".join([money_arg, category_arg, subcategory_arg])
+                            self.db.add_post_to_db(database_type, receiver, self.login, argument, comment_arg)
+                            QMessageBox.about(self, "Info", "Вы успешно добавли запись!")
                     elif dlg_post.want_to_create_category:
                         self.create_category(database_type)
                     elif dlg_post.want_to_create_subcategory:
@@ -173,22 +175,28 @@ class MyWidget(QMainWindow, Ui_MainWindow):
         try:
             if self.login is None:
                 raise BadEnterData("Вы не авторизованы!")
-            post_type = ChooseTypeDialog()
-            returnCode_post_type = post_type.exec_()
-            returned_value_post_type = post_type.getValue()
-            if returnCode_post_type:
-                if returned_value_post_type[0]:
-                    database_name = "expences"
-                elif returned_value_post_type[1]:
-                    database_name = "revenue"
-                statistic_type = ChooseTypeStatisticDialog()
-                returnCode_statistic_type = statistic_type.exec_()
-                returned_value_statistic_type = statistic_type.getValue()
-                if returnCode_statistic_type:
-                    if returned_value_statistic_type[0]:
+            statistic_type = ChooseTypeStatisticDialog()
+            returnCode_statistic_type = statistic_type.exec_()
+            if returnCode_statistic_type:
+                if statistic_type.want_graph:
+                    post_type = ChooseTypeDialog()
+                    returnCode_post_type = post_type.exec_()
+                    returned_value_post_type = post_type.getValue()
+                    if returned_value_post_type[0]:
+                        database_name = "expences"
+                    elif returned_value_post_type[1]:
+                        database_name = "revenue"
+                    if returnCode_post_type:
                         dlg_main = GraphStatisticDialog()
-                        dlg_main.select_data(database_name, self.login)
+                        dlg_main.select_data(self.login, database_name)
                         returnCode_main_dlg = dlg_main.exec_()
+                else:
+                    dlg_main = FigureStatisticDialog()
+                    dlg_main.select_data(self.login)
+                    returnCode_main_dlg = dlg_main.exec_()
+                    if returnCode_main_dlg:
+                        if dlg_main.want_description:
+                            pass
 
         except Exception as er:
             self.show_error_box(er)

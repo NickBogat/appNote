@@ -29,7 +29,7 @@
     <set>QDialogButtonBox::Cancel|QDialogButtonBox::Ok</set>
    </property>
   </widget>
-  <widget class="PlotWidget" name="graphWiget" native="true">
+  <widget class="PlotWidget" name="PlotWidget" native="true">
    <property name="geometry">
     <rect>
      <x>0</x>
@@ -115,7 +115,7 @@
   <customwidget>
    <class>PlotWidget</class>
    <extends>QWidget</extends>
-   <header>pyqtgrapgh</header>
+   <header>pyqtgraph</header>
    <container>1</container>
   </customwidget>
  </customwidgets>

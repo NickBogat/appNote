@@ -1,5 +1,5 @@
 import sqlite3
-from datetime import datetime
+from datetime import datetime, date, timedelta
 
 from extra.checkers import Checker
 from extra.callbacks import *
@@ -12,7 +12,7 @@ class Database:
         self.checker = Checker()
         self.help_dict_sub = {"expences": "subcategory_exp", "revenue": "subcategory_rev"}
         self.help_dict = {"expences": "category_exp", "revenue": "category_rev"}
-        self.help_dict_general = {}
+        self.help_dict_general = {"Наличные": "hand_cash", "Кредитная карта": "card_cash", "Вклад в банке": "bank_cash"}
         self.help_dict_to_short = {"expences": "exp", "revenue": "rev"}
 
     def show_login_info(self, login):
@@ -29,7 +29,7 @@ class Database:
         result = self.cursor.execute(query, (database_type, login,)).fetchall()
         return result
 
-    def add_post_to_db(self, database_type, login, argument, comment=""):
+    def add_post_to_db(self, database_type, receiver, login, argument, comment=""):
         try:
             if not (self.checker.check_login_exists(login)):
                 raise BadArgument("Польователя не существует!")
@@ -39,6 +39,15 @@ class Database:
             INSERT INTO {database_type}(date, amount, category, subcategory, comment, login) VALUES(?, ?, ?, ?, ?, ?)"""
             self.cursor.execute(query,
                                 (result_date, result_number, result_category, result_subcategory, comment, login,))
+            self.conn.commit()
+            sign = -1 if database_type == "expences" else 1
+            receiver_name = self.help_dict_general[receiver]
+            previous_balance = \
+                self.cursor.execute(f"""SELECT {receiver_name} FROM accounts WHERE login = ?""", (login,)).fetchall()[
+                    0][0]
+            new_balance = previous_balance + sign * result_number
+            query_to_accounts = f"""UPDATE accounts SET {receiver_name} = ?"""
+            self.cursor.execute(query_to_accounts, (new_balance,))
             self.conn.commit()
             return True
         except sqlite3.Error as er:
@@ -59,14 +68,14 @@ class Database:
     def show_all_user_expenses(self, login):
         if not (self.checker.check_login_exists(login)):
             raise BadArgument("Польователя не существует!")
-        query = f"""SELECT amount, category, date FROM expences WHERE (login = ?) AND (amount < 0)"""
+        query = f"""SELECT amount, category, date FROM expences WHERE (login = ?)"""
         result = self.cursor.execute(query, (login,)).fetchall()
         return result
 
     def show_all_user_revenue(self, login):
         if not (self.checker.check_login_exists(login)):
             raise BadArgument("Польователя не существует!")
-        query = f"""SELECT amount, category, date FROM revenue WHERE (login = ?) AND (amount > 0)"""
+        query = f"""SELECT amount, category, date FROM revenue WHERE (login = ?)"""
         result = self.cursor.execute(query, (login,)).fetchall()
         return result
 
@@ -168,8 +177,130 @@ class Database:
         except sqlite3.Error as er:
             print(f"[SQLITE ERROR] {er}")
 
-    def show_all_user_year_expences(self, login):
+    def show_all_user_months_posts_during_year(self, login, database_type):
         current_year = str(datetime.now().date().year)
-        query = f"""SELECT * FROM expences WHERE login = ? AND date like='{current_year}%'"""
-        result = self.cursor.execute(query, (login, )).fetchall()
+        query = f"""SELECT * FROM {database_type} WHERE login = ? AND date like'{current_year}%'"""
+        result = self.cursor.execute(query, (login,)).fetchall()
+        answer = {i: {} for i in range(1, 13)}
         print(result)
+        if result:
+            for i in result:
+                temp_date = i[1].split()[0]
+                temp_month_number = int(temp_date.split("-")[1])
+                temp_amount = i[2]
+                temp_category = i[3]
+                temp_sub_category = i[4]
+                answer[temp_month_number].setdefault(temp_category, {"Остальное": 0})
+                if temp_sub_category != "":
+                    answer[temp_month_number][temp_category].setdefault(temp_sub_category, 0)
+                if temp_sub_category == "":
+                    answer[temp_month_number][temp_category]["Остальное"] += temp_amount
+                else:
+                    answer[temp_month_number][temp_category][temp_sub_category] += temp_amount
+
+        print(answer)
+        return answer
+
+    def show_all_user_days_posts_during_year(self, login, database_type):
+        current_date = datetime.now().date()
+        query = f"""SELECT * FROM {database_type} WHERE login = ? AND date like'{current_date.year}%'"""
+        result = self.cursor.execute(query, (login,)).fetchall()
+        answer = {}
+        main = {}
+        print(result)
+        current_date = datetime.now().date()
+        first_year_day = date(current_date.year, 1, 1)
+        temp_date = first_year_day
+        while temp_date.year < int(current_date.year) + 1:
+            answer[str(temp_date)] = {}
+            temp_date = temp_date + timedelta(days=1)
+        for i in result:
+            temp_date = i[1].split()[0]
+            temp_amount = i[2]
+            temp_category = i[3]
+            temp_sub_category = i[4]
+            answer[temp_date].setdefault(temp_category, {"Остальное": 0})
+            if temp_sub_category != "":
+                answer[temp_date][temp_category].setdefault(temp_sub_category, 0)
+            if temp_sub_category == "":
+                answer[temp_date][temp_category]["Остальное"] += temp_amount
+            else:
+                answer[temp_date][temp_category][temp_sub_category] += temp_amount
+        for ind, val in enumerate(answer):
+            main[ind + 1] = answer[val]
+        print(main)
+        return main
+
+    def show_all_user_weeks_posts_during_year(self, login, database_type):
+        current_year = datetime.now().date().year
+        first_current_year_date = date(current_year, 1, 1)
+        query = f"""SELECT * FROM {database_type} WHERE login = ? AND date like'{current_year}%'"""
+        result = self.cursor.execute(query, (login,)).fetchall()
+        normal_date_year = first_current_year_date + timedelta(days=7 - first_current_year_date.isoweekday())
+        answer = {(first_current_year_date, normal_date_year): {}}
+        start_day = normal_date_year + timedelta(days=1)
+        while start_day <= date(current_year, 12, 31):
+            if start_day + timedelta(days=6) <= date(current_year, 12, 31):
+                answer[(start_day, start_day + timedelta(days=6))] = {}
+                start_day += timedelta(days=7)
+            else:
+                break
+        if list(answer.keys())[-1][1] != date(current_year, 12, 31):
+            answer[(start_day, start_day + timedelta(date(current_year, 12, 31).weekday()))] = {}
+        for post in result:
+            temp_date = post[1].split()[0]
+            year, month, day = map(int, temp_date.split("-"))
+            new_date = date(year, month, day)
+            temp_amount = post[2]
+            temp_category = post[3]
+            temp_sub_category = post[4]
+            for day in answer:
+                if day[0] <= new_date <= day[1]:
+                    answer[day].setdefault(temp_category, {"Остальное": 0})
+                    if temp_sub_category != "":
+                        answer[day][temp_category].setdefault(temp_sub_category, 0)
+                    if temp_sub_category == "":
+                        answer[day][temp_category]["Остальное"] += temp_amount
+                    else:
+                        answer[day][temp_category][temp_sub_category] += temp_amount
+        main = {ind: answer[val] for ind, val in enumerate(answer)}
+        return main
+
+    def show_general_posts_data_during_period(self, login, database_type, period):
+        current_date = datetime.now().date()
+        query = f"""SELECT * FROM {database_type} WHERE login = ? AND date like'{current_date.year}%'"""
+        result = list(self.cursor.execute(query, (login,)).fetchall())
+        prepared_data = []
+        if period == 'Месяц':
+            prepared_data = [i for i in result if i[1].split()[0][5:7] == str(current_date.month)]
+        elif period == 'Неделя':
+            first_day_week = current_date - timedelta(days=current_date.isoweekday())
+            last_day_week = first_day_week + timedelta(days=6)
+            for ind, val in enumerate(result):
+                year, month, day = map(int, val[1].split()[0].split("-"))
+                new_date = date(year, month, day)
+                if first_day_week <= new_date <= last_day_week:
+                    prepared_data.append(val)
+        elif period == "День":
+            prepared_data = [i for i in result if i[1].split()[0] == str(current_date)]
+        else:
+            prepared_data = result
+        return prepared_data
+
+    def prepare(self, data):
+        result = self.show_all_user_days_posts_during_year(login, database_type)
+        current_moment = datetime.now()
+        periods = []
+        visualise_data = {}
+        for p in result:
+            periods += list(set([i for i in result[p]]))
+        periods = list(set(periods))
+        visualise_data = {i: 0 for i in periods}
+        for val in result:
+            for j in result[val]:
+                temp_cat = j
+                temp_sum = 0
+                for h in result[val][temp_cat]:
+                    temp_sum += result[val][temp_cat][h]
+                visualise_data[temp_cat] += temp_sum
+        return visualise_data
