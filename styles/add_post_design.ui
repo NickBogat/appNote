@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>483</width>
-    <height>468</height>
+    <width>419</width>
+    <height>403</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -16,8 +16,8 @@
   <widget class="QDialogButtonBox" name="buttonBox">
    <property name="geometry">
     <rect>
-     <x>150</x>
-     <y>420</y>
+     <x>130</x>
+     <y>370</y>
      <width>161</width>
      <height>32</height>
     </rect>
@@ -29,94 +29,11 @@
     <set>QDialogButtonBox::Cancel|QDialogButtonBox::Ok</set>
    </property>
   </widget>
-  <widget class="QWidget" name="verticalLayoutWidget">
-   <property name="geometry">
-    <rect>
-     <x>80</x>
-     <y>50</y>
-     <width>131</width>
-     <height>131</height>
-    </rect>
-   </property>
-   <layout class="QVBoxLayout" name="verticalLayout">
-    <property name="spacing">
-     <number>20</number>
-    </property>
-    <item>
-     <widget class="QLabel" name="label">
-      <property name="text">
-       <string>Введите сумму:</string>
-      </property>
-     </widget>
-    </item>
-    <item>
-     <widget class="QLabel" name="label_2">
-      <property name="text">
-       <string>Введите категорию:</string>
-      </property>
-     </widget>
-    </item>
-    <item>
-     <widget class="QLabel" name="label_4">
-      <property name="text">
-       <string>Введите подкатегорию:</string>
-      </property>
-     </widget>
-    </item>
-   </layout>
-  </widget>
-  <widget class="QWidget" name="verticalLayoutWidget_2">
-   <property name="geometry">
-    <rect>
-     <x>240</x>
-     <y>50</y>
-     <width>160</width>
-     <height>131</height>
-    </rect>
-   </property>
-   <layout class="QVBoxLayout" name="verticalLayout_2">
-    <property name="spacing">
-     <number>15</number>
-    </property>
-    <item>
-     <widget class="QLineEdit" name="amountLine"/>
-    </item>
-    <item>
-     <widget class="QComboBox" name="categoryBox"/>
-    </item>
-    <item>
-     <widget class="QComboBox" name="subCategoryBox"/>
-    </item>
-   </layout>
-  </widget>
-  <widget class="QLabel" name="label_3">
-   <property name="geometry">
-    <rect>
-     <x>80</x>
-     <y>190</y>
-     <width>156</width>
-     <height>17</height>
-    </rect>
-   </property>
-   <property name="text">
-    <string>Комментарий(необязательно):</string>
-   </property>
-  </widget>
-  <widget class="QTextEdit" name="commentText">
-   <property name="geometry">
-    <rect>
-     <x>240</x>
-     <y>190</y>
-     <width>161</width>
-     <height>71</height>
-    </rect>
-   </property>
-  </widget>
   <widget class="QPushButton" name="createCategoryButton">
    <property name="geometry">
     <rect>
-     <x>240</x>
-     <y>290</y>
+     <x>10</x>
+     <y>300</y>
      <width>161</width>
      <height>23</height>
     </rect>
@@ -128,8 +45,8 @@
   <widget class="QPushButton" name="createSubCategoryButton">
    <property name="geometry">
     <rect>
-     <x>240</x>
-     <y>320</y>
+     <x>250</x>
+     <y>300</y>
      <width>161</width>
      <height>23</height>
     </rect>
@@ -137,6 +54,116 @@
    <property name="text">
     <string>Создать подкатегорию</string>
    </property>
+  </widget>
+  <widget class="QGroupBox" name="groupBox">
+   <property name="geometry">
+    <rect>
+     <x>10</x>
+     <y>10</y>
+     <width>401</width>
+     <height>281</height>
+    </rect>
+   </property>
+   <property name="styleSheet">
+    <string notr="true">QGroupBox {
+margin-top: 2ex;
+}
+QGroupBox:enabled {
+border: 2px solid black;
+border-radius: 5px;
+}
+QGroupBox::title {
+subcontrol-origin: margin;
+ left: 3ex;
+ }
+</string>
+   </property>
+   <property name="title">
+    <string/>
+   </property>
+   <widget class="QTextEdit" name="commentText">
+    <property name="geometry">
+     <rect>
+      <x>220</x>
+      <y>160</y>
+      <width>161</width>
+      <height>71</height>
+     </rect>
+    </property>
+   </widget>
+   <widget class="QWidget" name="verticalLayoutWidget_2">
+    <property name="geometry">
+     <rect>
+      <x>220</x>
+      <y>20</y>
+      <width>160</width>
+      <height>131</height>
+     </rect>
+    </property>
+    <layout class="QVBoxLayout" name="verticalLayout_2">
+     <property name="spacing">
+      <number>15</number>
+     </property>
+     <item>
+      <widget class="QLineEdit" name="amountLine"/>
+     </item>
+     <item>
+      <widget class="QComboBox" name="categoryBox"/>
+     </item>
+     <item>
+      <widget class="QComboBox" name="subCategoryBox"/>
+     </item>
+    </layout>
+   </widget>
+   <widget class="QLabel" name="label_3">
+    <property name="geometry">
+     <rect>
+      <x>20</x>
+      <y>160</y>
+      <width>156</width>
+      <height>17</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Комментарий(необязательно):</string>
+    </property>
+   </widget>
+   <widget class="QWidget" name="verticalLayoutWidget">
+    <property name="geometry">
+     <rect>
+      <x>20</x>
+      <y>20</y>
+      <width>131</width>
+      <height>131</height>
+     </rect>
+    </property>
+    <layout class="QVBoxLayout" name="verticalLayout">
+     <property name="spacing">
+      <number>20</number>
+     </property>
+     <item>
+      <widget class="QLabel" name="label">
+       <property name="text">
+        <string>Введите сумму:</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QLabel" name="label_2">
+       <property name="text">
+        <string>Введите категорию:</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QLabel" name="label_4">
+       <property name="text">
+        <string>Введите подкатегорию:</string>
+       </property>
+      </widget>
+     </item>
+    </layout>
+   </widget>
   </widget>
  </widget>
  <resources/>

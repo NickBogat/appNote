@@ -14,47 +14,72 @@ from PyQt5 import QtCore, QtGui, QtWidgets
 class Ui_Dialog_Auth(object):
     def setupUi(self, Dialog):
         Dialog.setObjectName("Dialog")
-        Dialog.resize(385, 295)
+        Dialog.resize(377, 275)
         self.buttonBox = QtWidgets.QDialogButtonBox(Dialog)
-        self.buttonBox.setGeometry(QtCore.QRect(120, 260, 151, 32))
+        self.buttonBox.setGeometry(QtCore.QRect(110, 240, 151, 32))
         self.buttonBox.setOrientation(QtCore.Qt.Horizontal)
         self.buttonBox.setStandardButtons(QtWidgets.QDialogButtonBox.Cancel|QtWidgets.QDialogButtonBox.Ok)
         self.buttonBox.setObjectName("buttonBox")
         self.label = QtWidgets.QLabel(Dialog)
-        self.label.setGeometry(QtCore.QRect(130, 20, 191, 41))
+        self.label.setGeometry(QtCore.QRect(120, 20, 131, 41))
         font = QtGui.QFont()
         font.setPointSize(16)
         self.label.setFont(font)
         self.label.setObjectName("label")
-        self.verticalLayoutWidget = QtWidgets.QWidget(Dialog)
-        self.verticalLayoutWidget.setGeometry(QtCore.QRect(120, 90, 160, 80))
+        self.groupBox = QtWidgets.QGroupBox(Dialog)
+        self.groupBox.setGeometry(QtCore.QRect(60, 60, 251, 151))
+        self.groupBox.setStyleSheet("QGroupBox {\n"
+"margin-top: 2ex;\n"
+"}\n"
+"QGroupBox:enabled {\n"
+"border: 1px solid black;\n"
+"border-radius: 5px;\n"
+"}\n"
+"QGroupBox::title {\n"
+"subcontrol-origin: margin;\n"
+" left: 3ex;\n"
+" }")
+        self.groupBox.setTitle("")
+        self.groupBox.setObjectName("groupBox")
+        self.label_2 = QtWidgets.QLabel(self.groupBox)
+        self.label_2.setGeometry(QtCore.QRect(10, 30, 51, 21))
+        self.label_2.setObjectName("label_2")
+        self.label_3 = QtWidgets.QLabel(self.groupBox)
+        self.label_3.setGeometry(QtCore.QRect(10, 70, 47, 13))
+        self.label_3.setObjectName("label_3")
+        self.verticalLayoutWidget = QtWidgets.QWidget(self.groupBox)
+        self.verticalLayoutWidget.setGeometry(QtCore.QRect(80, 20, 160, 80))
         self.verticalLayoutWidget.setObjectName("verticalLayoutWidget")
         self.verticalLayout = QtWidgets.QVBoxLayout(self.verticalLayoutWidget)
         self.verticalLayout.setContentsMargins(0, 0, 0, 0)
         self.verticalLayout.setObjectName("verticalLayout")
         self.loginEdit = QtWidgets.QLineEdit(self.verticalLayoutWidget)
+        self.loginEdit.setStyleSheet("border-radius: 5px;\n"
+"border: 1px solid black;\n"
+"\n"
+"")
         self.loginEdit.setObjectName("loginEdit")
         self.verticalLayout.addWidget(self.loginEdit)
         self.passEdit = QtWidgets.QLineEdit(self.verticalLayoutWidget)
+        self.passEdit.setStyleSheet("border: 1px solid black;\n"
+"border-radius: 5px;\n"
+"")
         self.passEdit.setObjectName("passEdit")
         self.verticalLayout.addWidget(self.passEdit)
-        self.label_2 = QtWidgets.QLabel(Dialog)
-        self.label_2.setGeometry(QtCore.QRect(60, 100, 51, 21))
-        self.label_2.setObjectName("label_2")
-        self.label_3 = QtWidgets.QLabel(Dialog)
-        self.label_3.setGeometry(QtCore.QRect(60, 140, 47, 13))
-        self.label_3.setObjectName("label_3")
-        self.label_4 = QtWidgets.QLabel(Dialog)
-        self.label_4.setGeometry(QtCore.QRect(170, 170, 131, 16))
+        self.label_4 = QtWidgets.QLabel(self.groupBox)
+        self.label_4.setGeometry(QtCore.QRect(10, 110, 111, 16))
         font = QtGui.QFont()
         font.setPointSize(7)
         self.label_4.setFont(font)
         self.label_4.setObjectName("label_4")
-        self.regButton = QtWidgets.QPushButton(Dialog)
-        self.regButton.setGeometry(QtCore.QRect(280, 170, 71, 23))
+        self.regButton = QtWidgets.QPushButton(self.groupBox)
+        self.regButton.setGeometry(QtCore.QRect(130, 107, 71, 23))
         font = QtGui.QFont()
         font.setPointSize(7)
         self.regButton.setFont(font)
+        self.regButton.setStyleSheet("border: 1px solid black;\n"
+"border-radius: 5px;\n"
+"")
         self.regButton.setObjectName("regButton")
 
         self.retranslateUi(Dialog)

@@ -1,6 +1,9 @@
 import sqlite3
 from datetime import datetime, date, timedelta
 
+from PyQt5.QtGui import QIcon
+from matplotlib import pyplot as plt
+import matplotlib as mpl
 from extra.checkers import Checker
 from extra.callbacks import *
 
@@ -14,6 +17,8 @@ class Database:
         self.help_dict = {"expences": "category_exp", "revenue": "category_rev"}
         self.help_dict_general = {"Наличные": "hand_cash", "Кредитная карта": "card_cash", "Вклад в банке": "bank_cash"}
         self.help_dict_to_short = {"expences": "exp", "revenue": "rev"}
+        self.help_dict_download = {"expences": "расходов", "revenue": "доходов",
+                                   "expences/revenue": "доходов и расходов"}
 
     def show_login_info(self, login):
         if not (self.checker.check_login_exists(login)):
@@ -25,8 +30,8 @@ class Database:
     def show_all_user_posts(self, login, database_type):
         if not (self.checker.check_login_exists(login)):
             raise BadArgument("Польователя не существует!")
-        query = f"""SELECT amount, category, date, comment FROM ? WHERE login = ?"""
-        result = self.cursor.execute(query, (database_type, login,)).fetchall()
+        query = f"""SELECT amount, date, category, subcategory, comment FROM {database_type} WHERE login = ?"""
+        result = self.cursor.execute(query, (login,)).fetchall()
         return result
 
     def add_post_to_db(self, database_type, receiver, login, argument, comment=""):
@@ -68,14 +73,14 @@ class Database:
     def show_all_user_expenses(self, login):
         if not (self.checker.check_login_exists(login)):
             raise BadArgument("Польователя не существует!")
-        query = f"""SELECT amount, category, date FROM expences WHERE (login = ?)"""
+        query = f"""SELECT amount, category, subcategory, comment, date FROM expences WHERE (login = ?)"""
         result = self.cursor.execute(query, (login,)).fetchall()
         return result
 
     def show_all_user_revenue(self, login):
         if not (self.checker.check_login_exists(login)):
             raise BadArgument("Польователя не существует!")
-        query = f"""SELECT amount, category, date FROM revenue WHERE (login = ?)"""
+        query = f"""SELECT amount, category, subcategory, comment, date FROM revenue WHERE (login = ?)"""
         result = self.cursor.execute(query, (login,)).fetchall()
         return result
 
@@ -86,10 +91,10 @@ class Database:
             user_data = self.show_all_user_expenses(login)
         today_date = datetime.now().date()
         visual_data = []
-        if user_data:
-            for i in user_data:
-                if self.checker.check_valid_date_period(today_date, i[2], period):
-                    visual_data.append(list(i))
+        for i in user_data:
+            if self.checker.check_valid_date_period(today_date, i[4], period):
+                temp = list(i)[:-1] + [i[-1].split()[0]]
+                visual_data.append(temp)
         return visual_data
 
     def show_all_categories_and_subcategories(self, database_type):
@@ -104,8 +109,6 @@ class Database:
             result_sub = self.cursor.execute(query_sub).fetchall()
             result_sub = {i[0]: i[1] for i in result_sub}
             result_cat = [(i[0], str(i[1])) for i in result_cat]
-            print(result_cat)
-            print(result_sub)
             answer = {}
             for i in result_cat:
                 temp = []
@@ -146,17 +149,14 @@ class Database:
                 self.conn.commit()
             sub_number = str(self.cursor.execute(query_second, (name,)).fetchall()[0][0])
             category_subs = str(self.cursor.execute(query_third, (category,)).fetchall()[0][0])
-            print(type(category_subs), len(category_subs))
             if category_subs != "None" and len(category_subs) != 0:
                 category_subs = category_subs.split("_")
                 if sub_number in category_subs:
                     raise BadArgument("Подкатегория уже существует!")
                 category_subs.append(sub_number)
-                print(category_subs)
                 new_subs = "_".join(category_subs)
             else:
                 new_subs = str(sub_number)
-            print(new_subs, type(new_subs))
             self.cursor.execute(query_fourth, (new_subs, category,))
             self.conn.commit()
         except sqlite3.Error as er:
@@ -171,7 +171,6 @@ class Database:
             prev_id = self.cursor.execute(f"""SELECT id FROM {database_type} WHERE name = ?""",
                                           (prev_name,)).fetchall()[0][0]
             query = f"""UPDATE {database_type} SET name = ? WHERE id = ?"""
-            print(query)
             self.cursor.execute(query, (new_name, prev_id,))
             self.conn.commit()
         except sqlite3.Error as er:
@@ -182,7 +181,6 @@ class Database:
         query = f"""SELECT * FROM {database_type} WHERE login = ? AND date like'{current_year}%'"""
         result = self.cursor.execute(query, (login,)).fetchall()
         answer = {i: {} for i in range(1, 13)}
-        print(result)
         if result:
             for i in result:
                 temp_date = i[1].split()[0]
@@ -197,8 +195,6 @@ class Database:
                     answer[temp_month_number][temp_category]["Остальное"] += temp_amount
                 else:
                     answer[temp_month_number][temp_category][temp_sub_category] += temp_amount
-
-        print(answer)
         return answer
 
     def show_all_user_days_posts_during_year(self, login, database_type):
@@ -207,7 +203,6 @@ class Database:
         result = self.cursor.execute(query, (login,)).fetchall()
         answer = {}
         main = {}
-        print(result)
         current_date = datetime.now().date()
         first_year_day = date(current_date.year, 1, 1)
         temp_date = first_year_day
@@ -228,7 +223,6 @@ class Database:
                 answer[temp_date][temp_category][temp_sub_category] += temp_amount
         for ind, val in enumerate(answer):
             main[ind + 1] = answer[val]
-        print(main)
         return main
 
     def show_all_user_weeks_posts_during_year(self, login, database_type):
@@ -287,20 +281,28 @@ class Database:
             prepared_data = result
         return prepared_data
 
-    def prepare(self, data):
-        result = self.show_all_user_days_posts_during_year(login, database_type)
-        current_moment = datetime.now()
-        periods = []
-        visualise_data = {}
-        for p in result:
-            periods += list(set([i for i in result[p]]))
-        periods = list(set(periods))
-        visualise_data = {i: 0 for i in periods}
-        for val in result:
-            for j in result[val]:
-                temp_cat = j
-                temp_sum = 0
-                for h in result[val][temp_cat]:
-                    temp_sum += result[val][temp_cat][h]
-                visualise_data[temp_cat] += temp_sum
+    def prepare_category_and_subcategory_data(self, data):
+        periods = list(set([i[3] for i in data]))
+        visualise_data = {i: {} for i in periods}
+        for val in data:
+            if val[4] == '':
+                visualise_data[val[3]].setdefault("Без подкатегории", 0)
+                visualise_data[val[3]]["Без подкатегории"] += val[2]
+            else:
+                visualise_data[val[3]].setdefault(val[4], 0)
+                visualise_data[val[3]][val[4]] += val[2]
         return visualise_data
+
+    def download_data(self, amounts, labels, file_name, figure_short_name):
+        figure_name = self.help_dict_download[figure_short_name]
+        px = 1 / plt.rcParams['figure.dpi']
+        fig = plt.figure(figsize=(690 * px, 590 * px))
+        mpl.rcParams.update({'font.size': 9})
+        plt.title(f'Диаграмма {figure_name} в %')
+        plt.pie(
+            amounts, autopct='%.1f', radius=1.1,
+            explode=[0.15] + [0 for _ in range(len(labels) - 1)])
+        plt.legend(
+            bbox_to_anchor=(-0.16, 0.45, 0.25, 0.25),
+            loc='lower left', labels=labels)
+        fig.savefig(file_name)

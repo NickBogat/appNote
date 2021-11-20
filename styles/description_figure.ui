@@ -2,22 +2,14 @@
 <ui version="4.0">
  <class>Dialog</class>
  <widget class="QDialog" name="Dialog">
-  <property name="geometry">
-   <rect>
-    <x>0</x>
-    <y>0</y>
-    <width>713</width>
-    <height>706</height>
-   </rect>
-  </property>
   <property name="windowTitle">
    <string>Dialog</string>
   </property>
   <widget class="QDialogButtonBox" name="buttonBox">
    <property name="geometry">
     <rect>
-     <x>280</x>
-     <y>670</y>
+     <x>270</x>
+     <y>840</y>
      <width>161</width>
      <height>32</height>
     </rect>
@@ -29,23 +21,26 @@
     <set>QDialogButtonBox::Cancel|QDialogButtonBox::Ok</set>
    </property>
   </widget>
-  <widget class="PlotWidget" name="PlotWidget" native="true">
+  <widget class="QPushButton" name="pushButton">
    <property name="geometry">
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>711</width>
-     <height>461</height>
+     <width>690</width>
+     <height>590</height>
     </rect>
+   </property>
+   <property name="text">
+    <string/>
    </property>
   </widget>
   <widget class="QGroupBox" name="groupBox">
    <property name="geometry">
     <rect>
-     <x>10</x>
-     <y>470</y>
-     <width>691</width>
-     <height>181</height>
+     <x>160</x>
+     <y>640</y>
+     <width>361</width>
+     <height>131</height>
     </rect>
    </property>
    <property name="styleSheet">
@@ -53,82 +48,23 @@
 margin-top: 2ex;
 }
 QGroupBox:enabled {
-border: 2px solid black;
+border: 1px solid black;
 border-radius: 5px;
 }
 QGroupBox::title {
 subcontrol-origin: margin;
  left: 3ex;
- }
-</string>
+ }</string>
    </property>
    <property name="title">
     <string/>
    </property>
-   <widget class="QTextBrowser" name="textBrowser">
-    <property name="geometry">
-     <rect>
-      <x>150</x>
-      <y>60</y>
-      <width>521</width>
-      <height>91</height>
-     </rect>
-    </property>
-    <property name="styleSheet">
-     <string notr="true">border: 1px solid black;
-border-radius: 1px;
-</string>
-    </property>
-   </widget>
    <widget class="QLabel" name="label">
     <property name="geometry">
      <rect>
-      <x>20</x>
-      <y>30</y>
-      <width>121</width>
-      <height>16</height>
-     </rect>
-    </property>
-    <property name="font">
-     <font>
-      <pointsize>10</pointsize>
-     </font>
-    </property>
-    <property name="text">
-     <string>Периоды времени:</string>
-    </property>
-   </widget>
-   <widget class="QComboBox" name="comboBox">
-    <property name="geometry">
-     <rect>
-      <x>150</x>
-      <y>27</y>
-      <width>111</width>
-      <height>22</height>
-     </rect>
-    </property>
-    <item>
-     <property name="text">
-      <string>Месяца</string>
-     </property>
-    </item>
-    <item>
-     <property name="text">
-      <string>Недели</string>
-     </property>
-    </item>
-    <item>
-     <property name="text">
-      <string>Дни</string>
-     </property>
-    </item>
-   </widget>
-   <widget class="QLabel" name="label_2">
-    <property name="geometry">
-     <rect>
-      <x>20</x>
-      <y>70</y>
-      <width>111</width>
+      <x>10</x>
+      <y>40</y>
+      <width>201</width>
       <height>21</height>
      </rect>
     </property>
@@ -138,19 +74,79 @@ border-radius: 1px;
      </font>
     </property>
     <property name="text">
-     <string>Вердикт:</string>
+     <string>Период:</string>
     </property>
+   </widget>
+   <widget class="QLabel" name="label_2">
+    <property name="geometry">
+     <rect>
+      <x>10</x>
+      <y>80</y>
+      <width>191</width>
+      <height>21</height>
+     </rect>
+    </property>
+    <property name="font">
+     <font>
+      <pointsize>10</pointsize>
+     </font>
+    </property>
+    <property name="text">
+     <string>Данные о:</string>
+    </property>
+   </widget>
+   <widget class="QComboBox" name="timeBox">
+    <property name="geometry">
+     <rect>
+      <x>230</x>
+      <y>40</y>
+      <width>111</width>
+      <height>22</height>
+     </rect>
+    </property>
+    <item>
+     <property name="text">
+      <string>Год</string>
+     </property>
+    </item>
+    <item>
+     <property name="text">
+      <string>Месяц</string>
+     </property>
+    </item>
+    <item>
+     <property name="text">
+      <string>Неделя</string>
+     </property>
+    </item>
+    <item>
+     <property name="text">
+      <string>День</string>
+     </property>
+    </item>
+   </widget>
+   <widget class="QComboBox" name="typeBox">
+    <property name="geometry">
+     <rect>
+      <x>230</x>
+      <y>80</y>
+      <width>111</width>
+      <height>22</height>
+     </rect>
+    </property>
+    <item>
+     <property name="text">
+      <string>Категориях</string>
+     </property>
+    </item>
+    <item>
+     <property name="text">
+      <string>Подкатегориях</string>
+     </property>
+    </item>
    </widget>
   </widget>
  </widget>
- <customwidgets>
-  <customwidget>
-   <class>PlotWidget</class>
-   <extends>QWidget</extends>
-   <header>pyqtgraph</header>
-   <container>1</container>
-  </customwidget>
- </customwidgets>
  <resources/>
  <connections>
   <connection>

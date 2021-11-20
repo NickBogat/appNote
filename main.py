@@ -35,18 +35,24 @@ class MyWidget(QMainWindow, Ui_MainWindow):
         msg.setWindowTitle("Error")
         msg.exec_()
 
+    def choose_post_type(self):
+        post_type = ChooseTypeDialog()
+        returnCode_post_type = post_type.exec_()
+        returned_value_post_type = post_type.getValue()
+        if returnCode_post_type:
+            if returned_value_post_type[0]:
+                database_name = "expences"
+            elif returned_value_post_type[1]:
+                database_name = "revenue"
+            return database_name
+        return None
+
     def add_post(self):
         try:
             if self.authorized:
-                dlg_type = ChooseTypeDialog()
-                returnCode_type = dlg_type.exec_()
-                returned_value_type = dlg_type.getValue()
-                if returnCode_type:
+                database_type = self.choose_post_type()
+                if database_type:
                     dlg_post = AddPostDialog()
-                    if returned_value_type[0]:
-                        database_type = "expences"
-                    elif returned_value_type[1]:
-                        database_type = "revenue"
                     dlg_post.select_data(database_type)
                     returnCode_post = dlg_post.exec_()
                     returned_value = dlg_post.getValue()
@@ -113,7 +119,7 @@ class MyWidget(QMainWindow, Ui_MainWindow):
             returned_value = dlg.getValue()
             if returnCode:
                 self.db.add_category(returned_value, database_type)
-                QMessageBox.about(self, "Info", f"Вы успешно создали категорию{returned_value}!")
+                QMessageBox.about(self, "Info", f"Вы успешно создали категорию {returned_value.lower()}!")
         except (BadArgument, Exception) as er:
             self.show_error_box(er)
 
@@ -127,7 +133,7 @@ class MyWidget(QMainWindow, Ui_MainWindow):
                 category, name = returned_value
                 self.db.add_sub_category(category, str(name), database_type)
                 QMessageBox.about(self, "Info",
-                                  f"Вы успешно создали подкатегорию {returned_value[1]} в {returned_value[0]}!")
+                                  f"Вы успешно создали подкатегорию {returned_value[1].lower()} в {returned_value[0].lower()}!")
         except (BadArgument, Exception) as er:
             self.show_error_box(er)
 
@@ -138,16 +144,9 @@ class MyWidget(QMainWindow, Ui_MainWindow):
             returned_value = dlg.getValue()
             returnCode = dlg.exec_()
             if dlg.want_to_change_category or dlg.want_to_change_sub_category:
-                dlg_type = ChooseTypeDialog()
-                returnCode_type = dlg_type.exec_()
-                returned_value_type = dlg_type.getValue()
-                if returnCode_type:
-                    if returned_value_type[0]:
-                        database_type = "exp"
-                        database_name = "expences"
-                    elif returned_value_type[1]:
-                        database_type = "rev"
-                        database_name = "revenue"
+                database_name = self.choose_post_type()
+                if database_name:
+                    database_type = database_name[:3]
                     if dlg.want_to_change_category:
                         dlg_change = ChangeCategoryName()
                         dlg_change.select_data(database_name)
@@ -157,7 +156,7 @@ class MyWidget(QMainWindow, Ui_MainWindow):
                             self.db.change_category_name("category_" + database_type, returned_value_changed[0],
                                                          returned_value_changed[1])
                             QMessageBox.about(self, "Info",
-                                              f"Вы успешно редактировали категорию {returned_value_changed[0]}!")
+                                              f"Вы успешно редактировали категорию {returned_value_changed[0].lower()}!")
                     elif dlg.want_to_change_sub_category:
                         dlg_change = ChangeSubCategoryName()
                         dlg_change.select_data(database_name)
@@ -167,7 +166,12 @@ class MyWidget(QMainWindow, Ui_MainWindow):
                             self.db.change_category_name("subcategory_" + database_type, returned_value_changed[0],
                                                          returned_value_changed[1])
                             QMessageBox.about(self, "Info",
-                                              f"Вы успешно редактировали под категорию {returned_value_changed[0]}!")
+                                              f"Вы успешно редактировали под категорию {returned_value_changed[0].lower()}!")
+            elif dlg.wand_to_exit:
+                self.login = None
+                self.authorized = False
+                QMessageBox.about(self, "Info", f"Вы успешно вышли из аккаунта!")
+
         except Exception as er:
             self.show_error_box(er)
 
@@ -179,14 +183,8 @@ class MyWidget(QMainWindow, Ui_MainWindow):
             returnCode_statistic_type = statistic_type.exec_()
             if returnCode_statistic_type:
                 if statistic_type.want_graph:
-                    post_type = ChooseTypeDialog()
-                    returnCode_post_type = post_type.exec_()
-                    returned_value_post_type = post_type.getValue()
-                    if returned_value_post_type[0]:
-                        database_name = "expences"
-                    elif returned_value_post_type[1]:
-                        database_name = "revenue"
-                    if returnCode_post_type:
+                    database_name = self.choose_post_type()
+                    if database_name:
                         dlg_main = GraphStatisticDialog()
                         dlg_main.select_data(self.login, database_name)
                         returnCode_main_dlg = dlg_main.exec_()
@@ -196,8 +194,16 @@ class MyWidget(QMainWindow, Ui_MainWindow):
                     returnCode_main_dlg = dlg_main.exec_()
                     if returnCode_main_dlg:
                         if dlg_main.want_description:
-                            pass
-
+                            database_name = self.choose_post_type()
+                            if database_name:
+                                dlg_desc = DescriptionFigureDialog()
+                                dlg_desc.select_data(self.login, database_name)
+                                returnCode_desc_dlg = dlg_desc.exec_()
+                                if returnCode_desc_dlg:
+                                    if dlg_desc.want_all_posts:
+                                        dlg_all_posts = AllPostsDialog()
+                                        dlg_all_posts.select_data(self.login, database_name)
+                                        returnCode_all_posts = dlg_all_posts.exec_()
         except Exception as er:
             self.show_error_box(er)
 

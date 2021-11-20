@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>356</width>
-    <height>277</height>
+    <width>341</width>
+    <height>268</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -16,8 +16,8 @@
   <widget class="QDialogButtonBox" name="buttonBox">
    <property name="geometry">
     <rect>
-     <x>90</x>
-     <y>240</y>
+     <x>100</x>
+     <y>230</y>
      <width>151</width>
      <height>32</height>
     </rect>
@@ -29,52 +29,84 @@
     <set>QDialogButtonBox::Cancel|QDialogButtonBox::Ok</set>
    </property>
   </widget>
-  <widget class="QWidget" name="verticalLayoutWidget">
+  <widget class="QGroupBox" name="groupBox">
    <property name="geometry">
     <rect>
-     <x>30</x>
-     <y>50</y>
-     <width>61</width>
-     <height>131</height>
+     <x>10</x>
+     <y>10</y>
+     <width>321</width>
+     <height>191</height>
     </rect>
    </property>
-   <layout class="QVBoxLayout" name="verticalLayout">
-    <item>
-     <widget class="QLabel" name="label">
-      <property name="text">
-       <string>Категория:</string>
-      </property>
-     </widget>
-    </item>
-    <item>
-     <widget class="QLabel" name="label_2">
-      <property name="text">
-       <string>Название:</string>
-      </property>
-     </widget>
-    </item>
-   </layout>
-  </widget>
-  <widget class="QWidget" name="verticalLayoutWidget_2">
-   <property name="geometry">
-    <rect>
-     <x>100</x>
-     <y>50</y>
-     <width>211</width>
-     <height>131</height>
-    </rect>
+   <property name="font">
+    <font>
+     <family>MS Serif</family>
+     <pointsize>11</pointsize>
+    </font>
    </property>
-   <layout class="QVBoxLayout" name="verticalLayout_2">
-    <property name="spacing">
-     <number>30</number>
+   <property name="styleSheet">
+    <string notr="true">QGroupBox {
+margin-top: 2ex;
+}
+QGroupBox:enabled {
+border: 1px solid black;
+border-radius: 5px;
+}
+QGroupBox::title {
+subcontrol-origin: margin;
+ left: 3ex;
+}</string>
+   </property>
+   <property name="title">
+    <string>Редактор</string>
+   </property>
+   <widget class="QWidget" name="verticalLayoutWidget">
+    <property name="geometry">
+     <rect>
+      <x>20</x>
+      <y>30</y>
+      <width>61</width>
+      <height>131</height>
+     </rect>
     </property>
-    <item>
-     <widget class="QComboBox" name="catBox"/>
-    </item>
-    <item>
-     <widget class="QLineEdit" name="nameEdit"/>
-    </item>
-   </layout>
+    <layout class="QVBoxLayout" name="verticalLayout">
+     <item>
+      <widget class="QLabel" name="label">
+       <property name="text">
+        <string>Категория:</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QLabel" name="label_2">
+       <property name="text">
+        <string>Название:</string>
+       </property>
+      </widget>
+     </item>
+    </layout>
+   </widget>
+   <widget class="QWidget" name="verticalLayoutWidget_2">
+    <property name="geometry">
+     <rect>
+      <x>90</x>
+      <y>30</y>
+      <width>211</width>
+      <height>131</height>
+     </rect>
+    </property>
+    <layout class="QVBoxLayout" name="verticalLayout_2">
+     <property name="spacing">
+      <number>30</number>
+     </property>
+     <item>
+      <widget class="QComboBox" name="catBox"/>
+     </item>
+     <item>
+      <widget class="QLineEdit" name="nameEdit"/>
+     </item>
+    </layout>
+   </widget>
   </widget>
  </widget>
  <resources/>
