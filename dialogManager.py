@@ -1,29 +1,29 @@
-from PyQt5.QtCore import QSize
-from PyQt5.QtGui import QPixmap, QIcon
-from PyQt5.QtWidgets import QDialog, QTableWidgetItem, QTableView, QHeaderView, QLineEdit
+from datetime import datetime, timedelta
+
+import pandas as pd
+import pyqtgraph as pg
 from PyQt5 import QtCore
+from PyQt5.QtCore import QSize
 from PyQt5.QtCore import Qt as Core
-from styles.auth_design import Ui_Dialog_Auth
-from styles.reg_design import Ui_Dialog_Reg
-from styles.profile_design import Ui_Profile_Dialog
+from PyQt5.QtGui import QPixmap, QIcon
+from PyQt5.QtWidgets import QDialog, QHeaderView, QLineEdit
+
+from dbManager import Database
+from extra.callbacks import *
 from styles.add_post_design import Ui_AddPost_Dialog
-from styles.create_category import Ui_Category_Dialog
-from styles.create_subcategory import Ui_Subcategory_Dialog
-from styles.choose_type_post import Ui_Type_Post_Dialog
+from styles.all_posts_design import Ui_All_Posts_Dialog
+from styles.auth_design import Ui_Dialog_Auth
 from styles.change_cat_name import Ui_Cat_Change_Dialog
 from styles.change_sub_cat_name import Ui_SubCat_Change_Dialog
+from styles.choose_type_post import Ui_Type_Post_Dialog
 from styles.choose_type_statistic import Ui_Choose_Type_Statistic_Dialog
+from styles.create_category import Ui_Category_Dialog
+from styles.create_subcategory import Ui_Subcategory_Dialog
+from styles.description_figure import Ui_Description_Figure_Dialog
+from styles.profile_design import Ui_Profile_Dialog
+from styles.reg_design import Ui_Dialog_Reg
 from styles.statistic_analyse import Ui_Statistic_Analyse_Dialog
 from styles.statistic_figure import Ui_Statistic_Figure_Dialog
-from styles.description_figure import Ui_Description_Figure_Dialog
-from styles.all_posts_design import Ui_All_Posts_Dialog
-from extra.checkers import Checker
-from extra.callbacks import *
-from dbManager import Database
-import pandas as pd
-import matplotlib.pyplot as plt
-import pyqtgraph as pg
-from datetime import datetime
 
 
 def spot_right_time_and_type(time, table_type):
@@ -83,6 +83,8 @@ class AuthDialog(QDialog, Ui_Dialog_Auth):
         self.regButton.clicked.connect(self.run)
         self.passEdit.setEchoMode(QLineEdit.Password)
         self.setStyleSheet("QDialog {background: white;}")
+        self.setWindowTitle("Вход")
+        self.setWindowIcon(QIcon("img/logo_window.png"))
 
     def getValue(self):
         login = self.loginEdit.text()
@@ -99,6 +101,8 @@ class RegDialog(QDialog, Ui_Dialog_Reg):
         super(RegDialog, self).__init__()
         self.setupUi(self)
         self.setStyleSheet("QDialog {background: white;}")
+        self.setWindowTitle("Регистрация")
+        self.setWindowIcon(QIcon("img/logo_window.png"))
 
     def getValue(self):
         login = self.loginEdit.text()
@@ -112,7 +116,12 @@ class AddPostDialog(QDialog, Ui_AddPost_Dialog):
         super(AddPostDialog, self).__init__()
         self.__db = Database()
         self.setupUi(self)
+        self.data = None
+        self.want_to_create_category = False
+        self.want_to_create_subcategory = False
         self.setStyleSheet("QDialog {background: white;}")
+        self.setWindowTitle("Добавление записи")
+        self.setWindowIcon(QIcon("img/plus_post.png"))
 
     def select_data(self, database_type):
         self.data = self.__db.show_all_categories_and_subcategories(database_type)
@@ -120,8 +129,6 @@ class AddPostDialog(QDialog, Ui_AddPost_Dialog):
             self.categoryBox.addItems(list(self.data.keys()))
             self.subCategoryBox.addItems(list(self.data[list(self.data.keys())[0]]))
         self.categoryBox.currentTextChanged.connect(self.category_changed)
-        self.want_to_create_category = False
-        self.want_to_create_subcategory = False
         self.createCategoryButton.clicked.connect(self.run)
         self.createSubCategoryButton.clicked.connect(self.run)
 
@@ -166,6 +173,8 @@ class ProfileDialog(QDialog, Ui_Profile_Dialog):
         self.editSubCategory.clicked.connect(self.run_change_sub_category)
         self.exitButton.clicked.connect(self.exit_account)
         self.setStyleSheet("QDialog {background: white;}")
+        self.setWindowTitle("Профиль")
+        self.setWindowIcon(QIcon("img/home.png"))
 
     def select_data(self, login):
         self.login = login
@@ -227,6 +236,8 @@ class CreateCategoryDialog(QDialog, Ui_Category_Dialog):
         super(CreateCategoryDialog, self).__init__()
         self.setupUi(self)
         self.setStyleSheet("QDialog {background: white;}")
+        self.setWindowTitle("Создание категории")
+        self.setWindowIcon(QIcon("img/plus_post.png"))
 
     def getValue(self):
         name = self.nameLine.text()
@@ -238,7 +249,10 @@ class CreateSubCategoryDialog(QDialog, Ui_Subcategory_Dialog):
         super(CreateSubCategoryDialog, self).__init__()
         self.setupUi(self)
         self.__db = Database()
+        self.categories = []
         self.setStyleSheet("QDialog {background: white;}")
+        self.setWindowTitle("Создание подкатегории")
+        self.setWindowIcon(QIcon("img/plus_post.png"))
 
     def select_data(self, database_type):
         self.categories = list(self.__db.show_all_categories_and_subcategories(database_type).keys())
@@ -257,6 +271,8 @@ class ChangeCategoryName(QDialog, Ui_Cat_Change_Dialog):
         self.__db = Database()
         self.catBox.currentTextChanged.connect(self.text_changed)
         self.setStyleSheet("QDialog {background: white;}")
+        self.setWindowTitle("Изменение категории")
+        self.setWindowIcon(QIcon("img/plus_post.png"))
 
     def select_data(self, database_type):
         categories = []
@@ -280,6 +296,8 @@ class ChangeSubCategoryName(QDialog, Ui_SubCat_Change_Dialog):
         self.__db = Database()
         self.catBox.currentTextChanged.connect(self.text_changed)
         self.setStyleSheet("QDialog {background: white;}")
+        self.setWindowTitle("Изменение подкатегории")
+        self.setWindowIcon(QIcon("img/plus_post.png"))
 
     def select_data(self, database_type):
         sub_categories = []
@@ -305,6 +323,8 @@ class ChooseTypeDialog(QDialog, Ui_Type_Post_Dialog):
         self.want_to_exp = False
         self.want_to_rev = False
         self.setStyleSheet("QDialog {background: white;}")
+        self.setWindowTitle("Выбрать тип записи")
+        self.setWindowIcon(QIcon("img/stat.png"))
 
     def run(self):
         button = self.sender()
@@ -327,6 +347,8 @@ class ChooseTypeStatisticDialog(QDialog, Ui_Choose_Type_Statistic_Dialog):
         self.analyseButton.clicked.connect(self.run)
         self.diagramButton.clicked.connect(self.run)
         self.setStyleSheet("QDialog {background: white;}")
+        self.setWindowTitle("Выбрать тип статистики")
+        self.setWindowIcon(QIcon("img/stat.png"))
 
     def run(self):
         button = self.sender().text()
@@ -352,23 +374,46 @@ class GraphStatisticDialog(QDialog, Ui_Statistic_Analyse_Dialog):
         self.comboBox.currentTextChanged.connect(self.text_changed)
         self.PlotWidget.plotItem.setMouseEnabled(y=False)
         self.setStyleSheet("QDialog {background: white;}")
+        self.setWindowTitle("График")
+        self.setWindowIcon(QIcon("img/stat.png"))
 
     def select_data(self, login, database_type):
         self.login = login
         self.database_type = database_type
-        result = self.__db.show_all_user_months_posts_during_year(login, database_type)
-        self.change_data(result)
+        result = self.__db.show_all_user_days_posts_during_year(login, database_type)
+        self.change_data(result, self.comboBox.currentText())
 
-    def change_data(self, result):
+    def change_data(self, result, period):
+        print(result)
+        current_date = datetime.now().date()
         self.PlotWidget.clear()
-        times = [i for i in result]
-        amounts = [0 for i in range(len(result))]
-        for ind, val in enumerate(result):
-            temp_sum = 0
-            for j in result[val]:
-                for h in result[val][j]:
-                    temp_sum += result[val][j][h]
-            amounts[ind] += temp_sum
+        visualise_data = {}
+        if period == "Год":
+            for i in result:
+                temp_s = 0
+                for j in result[i]:
+                    temp_s += sum(result[i][j].values())
+                visualise_data[i] = temp_s
+        elif period == "Месяц":
+            current_month = current_date.month
+            first_month_day = current_date - timedelta(days=current_date.day - 1)
+            while first_month_day.month == current_month:
+                temp_s = 0
+                for j in result[str(first_month_day)]:
+                    temp_s += sum(result[str(first_month_day)][j].values())
+                visualise_data[str(first_month_day)] = temp_s
+                first_month_day += timedelta(days=1)
+        elif period == "Неделя":
+            first_week_day = current_date - timedelta(days=current_date.weekday())
+            last_week_day = first_week_day + timedelta(days=6)
+            while first_week_day != last_week_day + timedelta(days=1):
+                temp_s = 0
+                for j in result[str(first_week_day)]:
+                    temp_s += sum(result[str(first_week_day)][j].values())
+                visualise_data[str(first_week_day)] = temp_s
+                first_week_day += timedelta(days=1)
+        times = [i + 1 for i in range(len(visualise_data))]
+        amounts = [i for i in visualise_data.values()]
         flag = False
         for i in range(len(amounts)):
             if amounts[i] > 1e5:
@@ -378,19 +423,32 @@ class GraphStatisticDialog(QDialog, Ui_Statistic_Analyse_Dialog):
             self.PlotWidget.setLabel('left', "<span style=\"color:blue;font-size:20px\">Сумма(в тыс. руб.)</span>")
         if len(amounts) == 0:
             raise BadEnterData("Нет данных об этом разделе!")
-        self.PlotWidget.plot(times, amounts, pen=self.pen)
-        self.PlotWidget.plotItem.vb.setLimits(xMin=1, xMax=times[-1], yMin=0, yMax=max(amounts))
+        if amounts:
+            self.PlotWidget.plot(times, amounts, pen=self.pen)
+            self.PlotWidget.plotItem.vb.setLimits(xMin=1, xMax=times[-1] + 1, yMin=0, yMax=max(amounts))
+            self.PlotWidget.setLabel('bottom', f"<span style=\"color:blue;font-size:20px\">{period}</span>")
+            test_analyse = self.__db.analyse_graph_data(result, period)
+            if test_analyse:
+                text = ""
+                for i in test_analyse:
+                    if test_analyse[i] < 0:
+                        if self.database_type == "expences":
+                            text += f"Вы сэканомили {abs(test_analyse[i])} руб. в подкатегории {i.lower()} \n"
+                        else:
+                            text += f"У вас упал доход на {abs(test_analyse[i])} руб. в подкатегории {i.lower()} \n"
+                    elif test_analyse[i] > 0:
+                        if self.database_type == "expences":
+                            text += f"У вас увеличились затраты на {abs(test_analyse[i])} руб. в подкатегории {i.lower()} \n"
+                        else:
+                            text += f"У повысился доход на {abs(test_analyse[i])} руб. в подкатегории {i.lower()} \n"
+                    else:
+                        text += f"Категория {i.lower()} в итоге оказалась без изменений \n"
+                self.textBrowser.setText(text)
 
     def text_changed(self):
         new_period = self.comboBox.currentText()
-        if new_period == "Месяца":
-            new_data = self.__db.show_all_user_months_posts_during_year(self.login, self.database_type)
-        elif new_period == "Дни":
-            new_data = self.__db.show_all_user_days_posts_during_year(self.login, self.database_type)
-        else:
-            new_data = self.__db.show_all_user_weeks_posts_during_year(self.login, self.database_type)
-        self.change_data(new_data)
-        self.PlotWidget.setLabel('bottom', f"<span style=\"color:blue;font-size:20px\">{new_period}</span>")
+        result = self.__db.show_all_user_days_posts_during_year(self.login, self.database_type)
+        self.change_data(result, new_period)
 
 
 class FigureStatisticDialog(QDialog, Ui_Statistic_Figure_Dialog):
@@ -403,6 +461,8 @@ class FigureStatisticDialog(QDialog, Ui_Statistic_Figure_Dialog):
         self.comboBox.currentTextChanged.connect(self.text_changed)
         self.pushButton.clicked.connect(self.do_description)
         self.setStyleSheet("QDialog {background: white;}")
+        self.setWindowTitle("Диаграмма")
+        self.setWindowIcon(QIcon("img/stat.png"))
 
     def select_data(self, login):
         self.login = login
@@ -451,6 +511,8 @@ class DescriptionFigureDialog(QDialog, Ui_Description_Figure_Dialog):
         self.timeBox.currentTextChanged.connect(self.text_changed)
         self.pushButton.clicked.connect(self.run)
         self.setStyleSheet("QDialog {background: white;}")
+        self.setWindowTitle("Диаграмма")
+        self.setWindowIcon(QIcon("img/stat.png"))
 
     def select_data(self, login, database_name):
         self.login = login
@@ -503,6 +565,8 @@ class AllPostsDialog(QDialog, Ui_All_Posts_Dialog):
         self.login = None
         self.database_name = None
         self.comboBox.currentTextChanged.connect(self.text_changed)
+        self.setWindowTitle("Все записи")
+        self.setWindowIcon(QIcon("img/stat.png"))
 
     def select_data(self, login, database_name):
         self.login = login

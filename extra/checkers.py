@@ -106,7 +106,7 @@ class Checker:
 
     def check_category_exists(self, database_type, name):
         query = f"""SELECT id FROM {database_type} WHERE name = ?"""
-        result = self.__cursor.execute(query, (name, )).fetchall()
+        result = self.__cursor.execute(query, (name,)).fetchall()
         if result:
             return True
         return False

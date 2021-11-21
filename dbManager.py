@@ -202,8 +202,6 @@ class Database:
         query = f"""SELECT * FROM {database_type} WHERE login = ? AND date like'{current_date.year}%'"""
         result = self.cursor.execute(query, (login,)).fetchall()
         answer = {}
-        main = {}
-        current_date = datetime.now().date()
         first_year_day = date(current_date.year, 1, 1)
         temp_date = first_year_day
         while temp_date.year < int(current_date.year) + 1:
@@ -221,9 +219,7 @@ class Database:
                 answer[temp_date][temp_category]["Остальное"] += temp_amount
             else:
                 answer[temp_date][temp_category][temp_sub_category] += temp_amount
-        for ind, val in enumerate(answer):
-            main[ind + 1] = answer[val]
-        return main
+        return answer
 
     def show_all_user_weeks_posts_during_year(self, login, database_type):
         current_year = datetime.now().date().year
@@ -257,7 +253,7 @@ class Database:
                         answer[day][temp_category]["Остальное"] += temp_amount
                     else:
                         answer[day][temp_category][temp_sub_category] += temp_amount
-        main = {ind: answer[val] for ind, val in enumerate(answer)}
+        main = {ind + 1: answer[val] for ind, val in enumerate(answer)}
         return main
 
     def show_general_posts_data_during_period(self, login, database_type, period):
@@ -306,3 +302,62 @@ class Database:
             bbox_to_anchor=(-0.16, 0.45, 0.25, 0.25),
             loc='lower left', labels=labels)
         fig.savefig(file_name)
+
+    def analyse_graph_data(self, data, period):
+        current_date = datetime.now().date()
+        sub_categories = set()
+        if period == "Год":
+            for i in data:
+                for j in data[i]:
+                    for k in data[i][j]:
+                        sub_categories.add(k)
+            categories = list(sub_categories)
+            answer_data = {i: {} for i in range(1, len(data) + 1)}
+            for ind, i in enumerate(data):
+                for j in data[i]:
+                    for h in data[i][j]:
+                        answer_data[ind + 1][h] = data[i][j][h]
+            main_result = {}
+            for i in categories:
+                temp = []
+                for val in answer_data:
+                    if i in answer_data[val]:
+                        temp.append(answer_data[val][i])
+                if len(temp) > 1:
+                    if temp[0] > temp[-1]:
+                        main_result[i] = temp[0] - temp[-1]
+                    elif temp[0] < temp[-1]:
+                        main_result[i] = -(temp[-1] - temp[0])
+                    else:
+                        main_result[i] = 0
+        else:
+            fist_month_date = current_date - timedelta(days=current_date.day - 1)
+            iterable_date = current_date - timedelta(days=current_date.day - 1)
+            new_data = {}
+            while fist_month_date.month == current_date.month:
+                new_data[str(fist_month_date)] = data[str(fist_month_date)]
+                fist_month_date += timedelta(days=1)
+            for i in new_data:
+                for j in new_data[i]:
+                    for k in new_data[i][j]:
+                        sub_categories.add(k)
+            categories = list(sub_categories)
+            answer_data = {i: {} for i in range(1, len(new_data) + 1)}
+            for ind, i in enumerate(new_data):
+                for j in new_data[i]:
+                    for h in new_data[i][j]:
+                        answer_data[ind + 1][h] = new_data[i][j][h]
+            main_result = {}
+            for i in categories:
+                temp = []
+                for val in answer_data:
+                    if i in answer_data[val]:
+                        temp.append(answer_data[val][i])
+                if len(temp) > 1:
+                    if temp[0] > temp[-1]:
+                        main_result[i] = temp[0] - temp[-1]
+                    elif temp[0] < temp[-1]:
+                        main_result[i] = -(temp[-1] - temp[0])
+                    else:
+                        main_result[i] = 0
+        return main_result

@@ -18,7 +18,7 @@ class Ui_Profile_Dialog(object):
         self.buttonBox = QtWidgets.QDialogButtonBox(Dialog)
         self.buttonBox.setGeometry(QtCore.QRect(180, 790, 161, 32))
         self.buttonBox.setOrientation(QtCore.Qt.Horizontal)
-        self.buttonBox.setStandardButtons(QtWidgets.QDialogButtonBox.Cancel|QtWidgets.QDialogButtonBox.Ok)
+        self.buttonBox.setStandardButtons(QtWidgets.QDialogButtonBox.Cancel | QtWidgets.QDialogButtonBox.Ok)
         self.buttonBox.setObjectName("buttonBox")
         self.tableView = QtWidgets.QTableView(Dialog)
         self.tableView.setGeometry(QtCore.QRect(30, 460, 461, 241))
@@ -61,14 +61,14 @@ class Ui_Profile_Dialog(object):
         self.groupBox_3.setLayoutDirection(QtCore.Qt.LeftToRight)
         self.groupBox_3.setAutoFillBackground(False)
         self.groupBox_3.setStyleSheet("QGroupBox:enabled {\n"
-"border: 3px solid black;\n"
-"border-radius: 7px;\n"
-"}\n"
-"QGroupBox::title {\n"
-"subcontrol-origin: margin;\n"
-" left: 1ex;\n"
-" }")
-        self.groupBox_3.setAlignment(QtCore.Qt.AlignJustify|QtCore.Qt.AlignVCenter)
+                                      "border: 3px solid black;\n"
+                                      "border-radius: 7px;\n"
+                                      "}\n"
+                                      "QGroupBox::title {\n"
+                                      "subcontrol-origin: margin;\n"
+                                      " left: 1ex;\n"
+                                      " }")
+        self.groupBox_3.setAlignment(QtCore.Qt.AlignJustify | QtCore.Qt.AlignVCenter)
         self.groupBox_3.setObjectName("groupBox_3")
         self.editCategory = QtWidgets.QPushButton(self.groupBox_3)
         self.editCategory.setGeometry(QtCore.QRect(30, 360, 180, 23))
@@ -83,16 +83,16 @@ class Ui_Profile_Dialog(object):
         font.setPointSize(11)
         self.groupBox_2.setFont(font)
         self.groupBox_2.setStyleSheet("QGroupBox {\n"
-"margin-top: 2ex;\n"
-"}\n"
-"QGroupBox:enabled {\n"
-"border: 2px solid black;\n"
-"border-radius: 5px;\n"
-"}\n"
-"QGroupBox::title {\n"
-"subcontrol-origin: margin;\n"
-" left: 3ex;\n"
-" }")
+                                      "margin-top: 2ex;\n"
+                                      "}\n"
+                                      "QGroupBox:enabled {\n"
+                                      "border: 2px solid black;\n"
+                                      "border-radius: 5px;\n"
+                                      "}\n"
+                                      "QGroupBox::title {\n"
+                                      "subcontrol-origin: margin;\n"
+                                      " left: 3ex;\n"
+                                      " }")
         self.groupBox_2.setObjectName("groupBox_2")
         self.bankPicture = QtWidgets.QLabel(self.groupBox_2)
         self.bankPicture.setGeometry(QtCore.QRect(10, 110, 31, 31))
@@ -165,16 +165,16 @@ class Ui_Profile_Dialog(object):
         font.setPointSize(11)
         self.groupBox.setFont(font)
         self.groupBox.setStyleSheet("QGroupBox {\n"
-"margin-top: 2ex;\n"
-"}\n"
-"QGroupBox:enabled {\n"
-"border: 2px solid black;\n"
-"border-radius: 5px;\n"
-"}\n"
-"QGroupBox::title {\n"
-"subcontrol-origin: margin;\n"
-" left: 3ex;\n"
-" }")
+                                    "margin-top: 2ex;\n"
+                                    "}\n"
+                                    "QGroupBox:enabled {\n"
+                                    "border: 2px solid black;\n"
+                                    "border-radius: 5px;\n"
+                                    "}\n"
+                                    "QGroupBox::title {\n"
+                                    "subcontrol-origin: margin;\n"
+                                    " left: 3ex;\n"
+                                    " }")
         self.groupBox.setObjectName("groupBox")
         self.verticalLayoutWidget_4 = QtWidgets.QWidget(self.groupBox)
         self.verticalLayoutWidget_4.setGeometry(QtCore.QRect(210, 30, 161, 80))

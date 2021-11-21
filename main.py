@@ -1,13 +1,10 @@
 import sys
 import traceback
-from PyQt5.QtGui import QPixmap, QIcon
 from PyQt5.QtWidgets import QApplication, QMainWindow, QMessageBox, QInputDialog
 
 from styles.design import Ui_MainWindow
 from extra.checkers import Checker
-from extra.callbacks import *
-from dbManager import Database
-from styles.dialogManager import *
+from dialogManager import *
 
 
 class MyWidget(QMainWindow, Ui_MainWindow):
@@ -26,6 +23,8 @@ class MyWidget(QMainWindow, Ui_MainWindow):
         self.plusButton.clicked.connect(self.add_post)
         self.homeButton.clicked.connect(self.open_account)
         self.statButton.clicked.connect(self.show_statistic)
+        self.setWindowTitle("Главное окно")
+        self.setWindowIcon(QIcon("img/logo_window.png"))
 
     def show_error_box(self, er):
         print(f"[ERROR] {er} - {traceback.format_exc()}")
@@ -213,4 +212,4 @@ if __name__ == '__main__':
     ex = MyWidget()
     ex.show()
     print(app.exec_())
-    sys.exit(app.exec_())
+    # sys.exit(app.exec_())

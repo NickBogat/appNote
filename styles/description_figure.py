@@ -17,7 +17,7 @@ class Ui_Description_Figure_Dialog(object):
         self.buttonBox = QtWidgets.QDialogButtonBox(Dialog)
         self.buttonBox.setGeometry(QtCore.QRect(270, 840, 161, 32))
         self.buttonBox.setOrientation(QtCore.Qt.Horizontal)
-        self.buttonBox.setStandardButtons(QtWidgets.QDialogButtonBox.Cancel|QtWidgets.QDialogButtonBox.Ok)
+        self.buttonBox.setStandardButtons(QtWidgets.QDialogButtonBox.Cancel | QtWidgets.QDialogButtonBox.Ok)
         self.buttonBox.setObjectName("buttonBox")
         self.pushButton = QtWidgets.QPushButton(Dialog)
         self.pushButton.setGeometry(QtCore.QRect(0, 0, 690, 590))
@@ -26,16 +26,16 @@ class Ui_Description_Figure_Dialog(object):
         self.groupBox = QtWidgets.QGroupBox(Dialog)
         self.groupBox.setGeometry(QtCore.QRect(160, 640, 361, 131))
         self.groupBox.setStyleSheet("QGroupBox {\n"
-"margin-top: 2ex;\n"
-"}\n"
-"QGroupBox:enabled {\n"
-"border: 1px solid black;\n"
-"border-radius: 5px;\n"
-"}\n"
-"QGroupBox::title {\n"
-"subcontrol-origin: margin;\n"
-" left: 3ex;\n"
-" }")
+                                    "margin-top: 2ex;\n"
+                                    "}\n"
+                                    "QGroupBox:enabled {\n"
+                                    "border: 1px solid black;\n"
+                                    "border-radius: 5px;\n"
+                                    "}\n"
+                                    "QGroupBox::title {\n"
+                                    "subcontrol-origin: margin;\n"
+                                    " left: 3ex;\n"
+                                    " }")
         self.groupBox.setTitle("")
         self.groupBox.setObjectName("groupBox")
         self.label = QtWidgets.QLabel(self.groupBox)

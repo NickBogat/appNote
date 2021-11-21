@@ -14,17 +14,17 @@ from PyQt5 import QtCore, QtGui, QtWidgets
 class Ui_Statistic_Analyse_Dialog(object):
     def setupUi(self, Dialog):
         Dialog.setObjectName("Dialog")
-        Dialog.resize(713, 706)
+        Dialog.resize(730, 706)
         self.buttonBox = QtWidgets.QDialogButtonBox(Dialog)
-        self.buttonBox.setGeometry(QtCore.QRect(280, 670, 161, 32))
+        self.buttonBox.setGeometry(QtCore.QRect(300, 670, 161, 32))
         self.buttonBox.setOrientation(QtCore.Qt.Horizontal)
         self.buttonBox.setStandardButtons(QtWidgets.QDialogButtonBox.Cancel | QtWidgets.QDialogButtonBox.Ok)
         self.buttonBox.setObjectName("buttonBox")
         self.PlotWidget = PlotWidget(Dialog)
-        self.PlotWidget.setGeometry(QtCore.QRect(0, 0, 711, 461))
+        self.PlotWidget.setGeometry(QtCore.QRect(5, 5, 721, 461))
         self.PlotWidget.setObjectName("PlotWidget")
         self.groupBox = QtWidgets.QGroupBox(Dialog)
-        self.groupBox.setGeometry(QtCore.QRect(10, 470, 691, 181))
+        self.groupBox.setGeometry(QtCore.QRect(20, 470, 691, 181))
         self.groupBox.setStyleSheet("QGroupBox {\n"
                                     "margin-top: 2ex;\n"
                                     "}\n"
@@ -56,7 +56,6 @@ class Ui_Statistic_Analyse_Dialog(object):
         self.comboBox.setObjectName("comboBox")
         self.comboBox.addItem("")
         self.comboBox.addItem("")
-        self.comboBox.addItem("")
         self.label_2 = QtWidgets.QLabel(self.groupBox)
         self.label_2.setGeometry(QtCore.QRect(20, 70, 111, 21))
         font = QtGui.QFont()
@@ -73,9 +72,8 @@ class Ui_Statistic_Analyse_Dialog(object):
         _translate = QtCore.QCoreApplication.translate
         Dialog.setWindowTitle(_translate("Dialog", "Dialog"))
         self.label.setText(_translate("Dialog", "Периоды времени:"))
-        self.comboBox.setItemText(0, _translate("Dialog", "Месяца"))
-        self.comboBox.setItemText(1, _translate("Dialog", "Недели"))
-        self.comboBox.setItemText(2, _translate("Dialog", "Дни"))
+        self.comboBox.setItemText(0, _translate("Dialog", "Год"))
+        self.comboBox.setItemText(1, _translate("Dialog", "Месяц"))
         self.label_2.setText(_translate("Dialog", "Вердикт:"))
 
 

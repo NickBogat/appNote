@@ -18,7 +18,7 @@ class Ui_AddPost_Dialog(object):
         self.buttonBox = QtWidgets.QDialogButtonBox(Dialog)
         self.buttonBox.setGeometry(QtCore.QRect(130, 370, 161, 32))
         self.buttonBox.setOrientation(QtCore.Qt.Horizontal)
-        self.buttonBox.setStandardButtons(QtWidgets.QDialogButtonBox.Cancel|QtWidgets.QDialogButtonBox.Ok)
+        self.buttonBox.setStandardButtons(QtWidgets.QDialogButtonBox.Cancel | QtWidgets.QDialogButtonBox.Ok)
         self.buttonBox.setObjectName("buttonBox")
         self.createCategoryButton = QtWidgets.QPushButton(Dialog)
         self.createCategoryButton.setGeometry(QtCore.QRect(10, 300, 161, 23))
@@ -29,17 +29,17 @@ class Ui_AddPost_Dialog(object):
         self.groupBox = QtWidgets.QGroupBox(Dialog)
         self.groupBox.setGeometry(QtCore.QRect(10, 10, 401, 281))
         self.groupBox.setStyleSheet("QGroupBox {\n"
-"margin-top: 2ex;\n"
-"}\n"
-"QGroupBox:enabled {\n"
-"border: 2px solid black;\n"
-"border-radius: 5px;\n"
-"}\n"
-"QGroupBox::title {\n"
-"subcontrol-origin: margin;\n"
-" left: 3ex;\n"
-" }\n"
-"")
+                                    "margin-top: 2ex;\n"
+                                    "}\n"
+                                    "QGroupBox:enabled {\n"
+                                    "border: 2px solid black;\n"
+                                    "border-radius: 5px;\n"
+                                    "}\n"
+                                    "QGroupBox::title {\n"
+                                    "subcontrol-origin: margin;\n"
+                                    " left: 3ex;\n"
+                                    " }\n"
+                                    "")
         self.groupBox.setTitle("")
         self.groupBox.setObjectName("groupBox")
         self.commentText = QtWidgets.QTextEdit(self.groupBox)

@@ -18,7 +18,7 @@ class Ui_Dialog_Auth(object):
         self.buttonBox = QtWidgets.QDialogButtonBox(Dialog)
         self.buttonBox.setGeometry(QtCore.QRect(110, 240, 151, 32))
         self.buttonBox.setOrientation(QtCore.Qt.Horizontal)
-        self.buttonBox.setStandardButtons(QtWidgets.QDialogButtonBox.Cancel|QtWidgets.QDialogButtonBox.Ok)
+        self.buttonBox.setStandardButtons(QtWidgets.QDialogButtonBox.Cancel | QtWidgets.QDialogButtonBox.Ok)
         self.buttonBox.setObjectName("buttonBox")
         self.label = QtWidgets.QLabel(Dialog)
         self.label.setGeometry(QtCore.QRect(120, 20, 131, 41))
@@ -29,16 +29,16 @@ class Ui_Dialog_Auth(object):
         self.groupBox = QtWidgets.QGroupBox(Dialog)
         self.groupBox.setGeometry(QtCore.QRect(60, 60, 251, 151))
         self.groupBox.setStyleSheet("QGroupBox {\n"
-"margin-top: 2ex;\n"
-"}\n"
-"QGroupBox:enabled {\n"
-"border: 1px solid black;\n"
-"border-radius: 5px;\n"
-"}\n"
-"QGroupBox::title {\n"
-"subcontrol-origin: margin;\n"
-" left: 3ex;\n"
-" }")
+                                    "margin-top: 2ex;\n"
+                                    "}\n"
+                                    "QGroupBox:enabled {\n"
+                                    "border: 1px solid black;\n"
+                                    "border-radius: 5px;\n"
+                                    "}\n"
+                                    "QGroupBox::title {\n"
+                                    "subcontrol-origin: margin;\n"
+                                    " left: 3ex;\n"
+                                    " }")
         self.groupBox.setTitle("")
         self.groupBox.setObjectName("groupBox")
         self.label_2 = QtWidgets.QLabel(self.groupBox)
@@ -55,15 +55,15 @@ class Ui_Dialog_Auth(object):
         self.verticalLayout.setObjectName("verticalLayout")
         self.loginEdit = QtWidgets.QLineEdit(self.verticalLayoutWidget)
         self.loginEdit.setStyleSheet("border-radius: 5px;\n"
-"border: 1px solid black;\n"
-"\n"
-"")
+                                     "border: 1px solid black;\n"
+                                     "\n"
+                                     "")
         self.loginEdit.setObjectName("loginEdit")
         self.verticalLayout.addWidget(self.loginEdit)
         self.passEdit = QtWidgets.QLineEdit(self.verticalLayoutWidget)
         self.passEdit.setStyleSheet("border: 1px solid black;\n"
-"border-radius: 5px;\n"
-"")
+                                    "border-radius: 5px;\n"
+                                    "")
         self.passEdit.setObjectName("passEdit")
         self.verticalLayout.addWidget(self.passEdit)
         self.label_4 = QtWidgets.QLabel(self.groupBox)
@@ -78,8 +78,8 @@ class Ui_Dialog_Auth(object):
         font.setPointSize(7)
         self.regButton.setFont(font)
         self.regButton.setStyleSheet("border: 1px solid black;\n"
-"border-radius: 5px;\n"
-"")
+                                     "border-radius: 5px;\n"
+                                     "")
         self.regButton.setObjectName("regButton")
 
         self.retranslateUi(Dialog)
